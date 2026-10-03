@@ -1,21 +1,27 @@
-# HubParser — Parsing de Dependências para o Português Brasileiro
+# HubParser — Parsing de Dependências Multi-tarefa para o Português Brasileiro
 
-Código da dissertação de mestrado que reimplementa e estende o
-[PortParser](https://aclanthology.org/2024.propor-1.1/) para o português brasileiro,
-sobre o corpus **Porttinari**: modelos multi-tarefa (UPOS + DEPREL + HEAD) com
-encoders BERT e dois cabeçotes de predição (linear e biaffine), acompanhados de um
-estudo de explicabilidade por camada (logit lens, probes, early exit, block skip).
+**HubParser** é o parser de dependências desenvolvido na dissertação de mestrado
+(PPGC/UFPel, 2026). É um estudo próprio: modelos multi-tarefa (UPOS + DEPREL + HEAD)
+com encoders BERT ajustados ponta a ponta e dois cabeçotes de predição (linear e
+biaffine), treinados no corpus **Porttinari**. A dissertação também traz um estudo de
+explicabilidade por camada (logit lens, probes, early exit, block skip).
 
-*Master's dissertation code: multi-task BERT dependency parsers for Brazilian
-Portuguese (Porttinari treebank) with linear and biaffine heads, plus a layer-wise
-explainability study.*
+O [PortParser](https://aclanthology.org/2024.propor-1.41/) (Lopes et al., 2024) é usado
+**apenas como baseline** de comparação no mesmo split do Porttinari (notebook 10). O
+HubParser não estende nem reimplementa o PortParser, e sua arquitetura e metodologia
+não se baseiam nele.
+
+*HubParser is the dependency parser developed in this master's dissertation: multi-task
+BERT parsers for Brazilian Portuguese (Porttinari treebank) with linear and biaffine
+heads, plus a layer-wise explainability study. PortParser is used only as a comparison
+baseline; HubParser is an independent study, not an extension of it.*
 
 ## Resultados principais
 
 | Modelo | UAS | LAS | UPOS |
 |---|---|---|---|
 | **BtL-Lin-MTL** (BERTimbau Large, linear, MTL) | **94,99** | **93,84** | 99,28 |
-| PortParser (referência, Lopes et al. 2024) | 96,08 | 94,61 | 99,09 |
+| PortParser (baseline, Lopes et al. 2024) | 96,08 | 94,61 | 99,09 |
 
 Encoders avaliados: BERTimbau Base/Large, mBERT, JabuticaBERT.
 Variantes: cabeçote {linear, biaffine} × {MTL com UPOS (cU), ablação sem UPOS (sU)}.
@@ -130,7 +136,7 @@ repositório dentro da pasta que contém `data_dois/` e os checkpoints, ou expor
    Logging no Weights & Biases é opcional (`WANDB_API_KEY`).
 2. **Avaliação**: notebooks 06–09 reproduzem as métricas da dissertação
    (acurácia UPOS/DEPREL, UAS, LAS; 1º subtoken, decodificação gulosa, sem MST).
-3. **Baseline**: notebook 10 reproduz o PortParser no mesmo split.
+3. **Baseline**: o notebook 10 reproduz o PortParser no mesmo split, só para comparação.
 4. **Explicabilidade**: o notebook **11** é autocontido — reproduz logit lens,
    early exit, block skip, probes por camada e o etiquetador UPOS com saída
    antecipada, gravando os CSVs em `outputs_explicabilidade/` (os valores de
