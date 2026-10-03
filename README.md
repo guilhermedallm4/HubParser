@@ -28,7 +28,7 @@ de acurácia com speedup de 3,67×.
 ## Estrutura
 
 ```
-ParseH2IA/
+HubParser/
 ├── notebooks/
 │   ├── 01_otimizacao_treino_linear.ipynb      # Optuna + treino, cabeçote linear
 │   ├── 02_otimizacao_treino_biaffine.ipynb    # Optuna + treino, cabeçote biaffine
@@ -114,7 +114,7 @@ Lives in BERT Depends on Who Is Asking"* (em submissão).
 
 ```bibtex
 @mastersthesis{lima2026parseh2ia,
-  title  = {ParseH2IA: parsing de dependências multi-tarefa para o português
+  title  = {HubParser: parsing de dependências multi-tarefa para o português
             brasileiro com encoders BERT},
   author = {Lima, Guilherme Dallman},
   school = {Universidade Federal de Pelotas},
