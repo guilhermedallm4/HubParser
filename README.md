@@ -1,4 +1,4 @@
-# ParseH2IA — Parsing de Dependências para o Português Brasileiro
+# HubParser — Parsing de Dependências para o Português Brasileiro
 
 Código da dissertação de mestrado que reimplementa e estende o
 [PortParser](https://aclanthology.org/2024.propor-1.1/) para o português brasileiro,
