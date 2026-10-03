@@ -25,6 +25,37 @@ Do estudo de explicabilidade: a hierarquia UPOS→DEPREL→HEAD emerge em profun
 superior da rede); um etiquetador UPOS com encoder truncado na camada 3 mantém 98,35%
 de acurácia com speedup de 3,67×.
 
+## Modelos no Hugging Face
+
+Os 8 modelos MTL (com UPOS) foram retreinados com os melhores hiperparâmetros do Optuna,
+seed 42, padding 512 e 40 épocas; o modelo publicado é o do fim da época 40. Eles estão
+publicados como `guilhermedallm4/HubParser-<Encoder>-<Cabeçote>`. Teste do Porttinari
+(UPOS / UAS / LAS):
+
+| Modelo | Retreinado | Dissertação |
+|---|---|---|
+| [HubParser-BERTimbau-large-Linear](https://huggingface.co/guilhermedallm4/HubParser-BERTimbau-large-Linear) | 99,26 / 94,71 / 93,52 | 99,28 / 94,99 / 93,84 |
+| [HubParser-BERTimbau-large-Biaffine](https://huggingface.co/guilhermedallm4/HubParser-BERTimbau-large-Biaffine) | 99,32 / 90,93 / 89,89 | 99,34 / 91,52 / 90,56 |
+| [HubParser-BERTimbau-base-Linear](https://huggingface.co/guilhermedallm4/HubParser-BERTimbau-base-Linear) | 99,19 / 93,45 / 92,16 | 99,22 / 93,74 / 92,49 |
+| [HubParser-BERTimbau-base-Biaffine](https://huggingface.co/guilhermedallm4/HubParser-BERTimbau-base-Biaffine) | 99,25 / 89,06 / 87,95 | 99,27 / 89,84 / 88,71 |
+| [HubParser-mBERT-Linear](https://huggingface.co/guilhermedallm4/HubParser-mBERT-Linear) | 98,89 / 92,50 / 90,95 | 98,88 / 92,70 / 91,04 |
+| [HubParser-mBERT-Biaffine](https://huggingface.co/guilhermedallm4/HubParser-mBERT-Biaffine) | 98,92 / 87,50 / 86,02 | 98,93 / 86,92 / 85,42 |
+| [HubParser-JabuticaBERT-Linear](https://huggingface.co/guilhermedallm4/HubParser-JabuticaBERT-Linear) | 98,79 / 88,78 / 87,17 | 98,81 / 87,78 / 86,25 |
+| [HubParser-JabuticaBERT-Biaffine](https://huggingface.co/guilhermedallm4/HubParser-JabuticaBERT-Biaffine) | 98,91 / 92,08 / 90,60 | 98,92 / 88,98 / 87,44 |
+
+Uso (a entrada é uma lista de frases já tokenizadas em palavras):
+
+```python
+from transformers import AutoModel, AutoTokenizer
+
+repo = "guilhermedallm4/HubParser-BERTimbau-large-Linear"
+tokenizer = AutoTokenizer.from_pretrained(repo)
+model = AutoModel.from_pretrained(repo, trust_remote_code=True).eval()
+
+model.parse([["O", "canal", "terá", "o", "conteúdo", "reformulado", "."]], tokenizer)
+# [[{'id': 1, 'form': 'O', 'upos': 'DET', 'head': 2, 'deprel': 'det'}, ...]]
+```
+
 ## Estrutura
 
 ```
@@ -85,12 +116,13 @@ O corpus **Porttinari** deve ser obtido junto aos autores/portal do
 (`data_dois/complaints_dataset_obj_outxpos`, splits train/val/test com colunas
 `tokens`, `upos`, `deprel`, `head_tags`). Os checkpoints dos modelos treinados
 (`linear_BERTimbau_base/`, `biaffine_BERTImbau_base/`, etc.) são grandes demais
-para o GitHub — treine-os com os notebooks 01–05 ou solicite aos autores.
+para o GitHub — treine-os com os notebooks 01–05 ou use as versões publicadas no
+Hugging Face (seção [Modelos no Hugging Face](#modelos-no-hugging-face)).
 
 Os notebooks e scripts localizam dados e checkpoints pela variável de ambiente
-`PARSEH2IA_DATA` (default: diretório pai do repositório — isto é, clone o
+`HUBPARSER_DATA` (default: diretório pai do repositório — isto é, clone o
 repositório dentro da pasta que contém `data_dois/` e os checkpoints, ou exporte
-`PARSEH2IA_DATA=/caminho/para/dados`).
+`HUBPARSER_DATA=/caminho/para/dados`).
 
 ### 3. Ordem de execução
 
@@ -113,7 +145,7 @@ Artigo do estudo por camada: *"Information, Behavior, and Format: Where Syntax
 Lives in BERT Depends on Who Is Asking"* (em submissão).
 
 ```bibtex
-@mastersthesis{lima2026parseh2ia,
+@mastersthesis{lima2026hubparser,
   title  = {HubParser: parsing de dependências multi-tarefa para o português
             brasileiro com encoders BERT},
   author = {Lima, Guilherme Dallman},

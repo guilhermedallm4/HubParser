@@ -34,7 +34,7 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 
-MSC = os.environ.get('PARSEH2IA_DATA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+MSC = os.environ.get('HUBPARSER_DATA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 MODEL_PATH = f'{MSC}/biaffine_BERTimbau_large'
 TOKENIZER_NAME = 'neuralmind/bert-large-portuguese-cased'

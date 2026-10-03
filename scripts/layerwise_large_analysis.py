@@ -24,7 +24,7 @@ matplotlib.use('Agg')
 import pandas as pd
 import torch
 
-MSC = os.environ.get('PARSEH2IA_DATA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+MSC = os.environ.get('HUBPARSER_DATA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 MODEL_PATH = f'{MSC}/biaffine_BERTimbau_large'
 TOKENIZER_NAME = 'neuralmind/bert-large-portuguese-cased'
 TAG = 'biaffine_bertimbau_large'

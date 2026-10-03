@@ -30,7 +30,7 @@ matplotlib.use('Agg')
 import pandas as pd
 import torch
 
-MSC = os.environ.get('PARSEH2IA_DATA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+MSC = os.environ.get('HUBPARSER_DATA', os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 MBERT_TOKENIZER = 'google-bert/bert-base-multilingual-cased'
 
 DATA_SETUP = """
