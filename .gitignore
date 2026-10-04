@@ -17,3 +17,13 @@ notebooks/outputs_explicabilidade/
 wandb/
 trainer_output/
 epoch_predictions/
+
+# Experimentos multilíngues: dados gerados, checkpoints e modelos ficam locais
+multilingual/data/built/
+multilingual/data/ud/
+multilingual/runs/
+multilingual/models/
+multilingual/logs/
+multilingual/results/*/tmp_run/
+multilingual/results/*/optuna.db
+multilingual/results/*__smoke/

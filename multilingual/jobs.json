@@ -1,0 +1,20 @@
+{
+  "_comment": "Fila de cada máquina, executada em ordem por run_queue.py. Cada job = busca Optuna (10 trials x 5 folds) + treino final. Para mudar a divisão entre máquinas, edite as listas.",
+  "maquina_beto": [
+    {"encoder": "beto", "head": "linear", "corpus": "multilingual"},
+    {"encoder": "beto", "head": "biaffine", "corpus": "multilingual"},
+    {"encoder": "beto", "head": "biaffine_fix", "corpus": "multilingual"},
+    {"encoder": "mbert", "head": "linear", "corpus": "multilingual"},
+    {"encoder": "bertimbau-base", "head": "biaffine_fix", "corpus": "pt"},
+    {"encoder": "mbert", "head": "biaffine_fix", "corpus": "pt"},
+    {"encoder": "jabuticabert", "head": "biaffine_fix", "corpus": "pt"},
+    {"encoder": "bertimbau-large", "head": "biaffine_fix", "corpus": "pt"}
+  ],
+  "maquina_bert": [
+    {"encoder": "bert", "head": "linear", "corpus": "multilingual"},
+    {"encoder": "bert", "head": "biaffine", "corpus": "multilingual"},
+    {"encoder": "bert", "head": "biaffine_fix", "corpus": "multilingual"},
+    {"encoder": "mbert", "head": "biaffine", "corpus": "multilingual"},
+    {"encoder": "mbert", "head": "biaffine_fix", "corpus": "multilingual"}
+  ]
+}
