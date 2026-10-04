@@ -10,6 +10,9 @@ Usage:
 """
 import argparse
 import json
+import os
+import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -28,6 +31,8 @@ def reload_jobs(push):
         subprocess.run(["git", "pull", "-q", "--rebase", "--autostash"], cwd=REPO, check=False)
     JOBS = json.loads((ROOT / "jobs.json").read_text())
 SYNC_EVERY_S = 6 * 3600
+STALL_S = 45 * 60      # a step whose log does not grow for this long is considered hung
+MAX_RESTARTS = 3
 POOL = "compartilhado"  # jobs taken by whichever machine finishes its own queue first
 CONFIGS = json.loads((ROOT / "data" / "search_configs.json").read_text())["configs"]
 
@@ -131,24 +136,52 @@ def next_pool_job(machine, push):
 
 
 def run_step(module, j, push, machine):
+    """Run one step as a subprocess. If its log stops growing for STALL_S (a hang, e.g. a
+    DataLoader deadlock), kill the whole process group and run the step again; the
+    search resumes from the last finished fold."""
     name = job_name(j)
     (ROOT / "logs").mkdir(exist_ok=True)
-    logfile = open(ROOT / "logs" / f"{name}__{module}.log", "a")
+    logpath = ROOT / "logs" / f"{name}__{module}.log"
     cmd = [sys.executable, "-m", f"hubparser_ml.{module}", "--encoder", j["encoder"], "--head", j["head"], "--corpus", j["corpus"]]
-    log(f"start {module} {name}")
-    p = subprocess.Popen(cmd, cwd=ROOT, stdout=logfile, stderr=subprocess.STDOUT)
-    last_sync = time.time()
-    while p.poll() is None:
-        time.sleep(60)
-        if time.time() - last_sync > SYNC_EVERY_S:
+    for attempt in range(1, MAX_RESTARTS + 2):
+        log(f"start {module} {name}" + (f" (attempt {attempt})" if attempt > 1 else ""))
+        logfile = open(logpath, "a")
+        p = subprocess.Popen(cmd, cwd=ROOT, stdout=logfile, stderr=subprocess.STDOUT, start_new_session=True)
+        last_sync = last_growth = time.time()
+        last_size = logpath.stat().st_size
+        stalled = False
+        while p.poll() is None:
+            time.sleep(60)
+            size = logpath.stat().st_size
+            if size != last_size:
+                last_size, last_growth = size, time.time()
+            elif time.time() - last_growth > STALL_S:
+                stalled = True
+                log(f"STALLED {module} {name}: log unchanged for {STALL_S // 60} min; killing and restarting")
+                try:
+                    os.killpg(p.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                p.wait()
+                break
+            if time.time() - last_sync > SYNC_EVERY_S:
+                git_sync(f"multilingual: progresso {name} ({machine})", push)
+                last_sync = time.time()
+        logfile.close()
+        shutil.rmtree(ROOT / "results" / name / "tmp_run", ignore_errors=True)
+        shutil.rmtree(ROOT / "runs" / name, ignore_errors=True)
+        if stalled:
+            continue
+        if p.returncode != 0:
+            log(f"FAILED {module} {name} (exit {p.returncode}); see logs/{name}__{module}.log")
             git_sync(f"multilingual: progresso {name} ({machine})", push)
-            last_sync = time.time()
-    if p.returncode != 0:
-        log(f"FAILED {module} {name} (exit {p.returncode}); see logs/{name}__{module}.log")
-        git_sync(f"multilingual: progresso {name} ({machine})", push)
-        sys.exit(p.returncode)
-    git_sync(f"multilingual: {name} {'busca concluída' if module == 'search' else 'treino final concluído'} ({machine})", push)
-    log(f"done {module} {name}")
+            sys.exit(p.returncode)
+        git_sync(f"multilingual: {name} {'busca concluída' if module == 'search' else 'treino final concluído'} ({machine})", push)
+        log(f"done {module} {name}")
+        return
+    log(f"FAILED {module} {name}: stalled {MAX_RESTARTS + 1} times in a row")
+    git_sync(f"multilingual: progresso {name} ({machine})", push)
+    sys.exit(1)
 
 
 def status(machines):
