@@ -1,17 +1,62 @@
 {
-  "_comment": "Fila de cada máquina, relida (com git pull) antes de cada job por run_queue.py. Cada job = busca Optuna (10 trials x 5 folds) + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix (o biaffine original, com alvo desalinhado, não é mais executado).",
+  "_comment": "Fila de cada máquina, relida (com git pull) antes de cada job por run_queue.py. Cada job = busca Optuna (10 trials x 5 folds) + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix. O biaffine original (alvo desalinhado) roda só no BETO-es, como comparação com a correção.",
   "maquina_beto": [
-    {"encoder": "beto", "head": "linear", "corpus": "es"},
-    {"encoder": "beto", "head": "biaffine_fix", "corpus": "es"},
-    {"encoder": "mbert", "head": "linear", "corpus": "multilingual"},
-    {"encoder": "bertimbau-base", "head": "biaffine_fix", "corpus": "pt"},
-    {"encoder": "mbert", "head": "biaffine_fix", "corpus": "pt"},
-    {"encoder": "jabuticabert", "head": "biaffine_fix", "corpus": "pt"}
+    {
+      "encoder": "beto",
+      "head": "linear",
+      "corpus": "es"
+    },
+    {
+      "encoder": "beto",
+      "head": "biaffine_fix",
+      "corpus": "es"
+    },
+    {
+      "encoder": "beto",
+      "head": "biaffine",
+      "corpus": "es"
+    },
+    {
+      "encoder": "mbert",
+      "head": "linear",
+      "corpus": "multilingual"
+    },
+    {
+      "encoder": "bertimbau-base",
+      "head": "biaffine_fix",
+      "corpus": "pt"
+    },
+    {
+      "encoder": "mbert",
+      "head": "biaffine_fix",
+      "corpus": "pt"
+    },
+    {
+      "encoder": "jabuticabert",
+      "head": "biaffine_fix",
+      "corpus": "pt"
+    }
   ],
   "maquina_bert": [
-    {"encoder": "bert", "head": "linear", "corpus": "en"},
-    {"encoder": "bert", "head": "biaffine_fix", "corpus": "en"},
-    {"encoder": "mbert", "head": "biaffine_fix", "corpus": "multilingual"},
-    {"encoder": "bertimbau-large", "head": "biaffine_fix", "corpus": "pt"}
+    {
+      "encoder": "bert",
+      "head": "linear",
+      "corpus": "en"
+    },
+    {
+      "encoder": "bert",
+      "head": "biaffine_fix",
+      "corpus": "en"
+    },
+    {
+      "encoder": "mbert",
+      "head": "biaffine_fix",
+      "corpus": "multilingual"
+    },
+    {
+      "encoder": "bertimbau-large",
+      "head": "biaffine_fix",
+      "corpus": "pt"
+    }
   ]
 }

@@ -47,8 +47,9 @@ São executadas duas variantes de cabeçote:
   palavra-head, e com a raiz no `[CLS]`.
 
 O código ainda aceita `biaffine`, o biaffine original da dissertação, cujo alvo de head é
-o índice da palavra usado como posição na sequência. Ele tem esse desalinhamento e não
-está na fila.
+o índice da palavra usado como posição na sequência. Por causa desse desalinhamento, ele
+roda só num job (`beto__biaffine__es`, na máquina BETO), como comparação direta com o
+`biaffine_fix`.
 
 A fila também inclui o `biaffine_fix` no português (só Porttinari) para BERTimbau-base,
 BERTimbau-large, mBERT e JabuticaBERT, para comparar com os biaffine da dissertação.
