@@ -64,12 +64,12 @@ model.parse([["O", "canal", "terá", "o", "conteúdo", "reformulado", "."]], tok
 
 ## Experimentos multilíngues (em andamento)
 
-A pasta [`multilingual/`](multilingual/) estende a avaliação para inglês
-(UD_English-EWT) e espanhol (UD_Spanish-AnCora), além do Porttinari. Os encoders
-BERT-base-cased, BETO e mBERT são treinados num corpus multilíngue conjunto, com os
-cabeçotes linear, biaffine e biaffine corrigido (alvo de head no primeiro subtoken da
-palavra), avaliados com decodificação gulosa, Eisner e MST. O protocolo de busca é o
-mesmo da dissertação. Instruções de execução: [`multilingual/INSTRUCOES_CLAUDE.md`](multilingual/INSTRUCOES_CLAUDE.md).
+A pasta [`multilingual/`](multilingual/) repete o desenho da dissertação em outras
+línguas. O BERT-base-cased é treinado no inglês (UD_English-EWT) e o BETO no espanhol
+(UD_Spanish-AnCora), e o mBERT treina num corpus conjunto (Porttinari + EWT + AnCora).
+Todos usam os cabeçotes linear, biaffine e biaffine corrigido (alvo de head no primeiro
+subtoken da palavra) e são avaliados com decodificação gulosa, Eisner e MST. O
+protocolo de busca é o mesmo da dissertação. Instruções de execução: [`multilingual/INSTRUCOES_CLAUDE.md`](multilingual/INSTRUCOES_CLAUDE.md).
 
 ## Estrutura
 

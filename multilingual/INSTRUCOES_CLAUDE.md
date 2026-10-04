@@ -4,14 +4,33 @@ Este arquivo é para o Claude (ou quem for operar a máquina) seguir passo a pas
 O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_beto`) ou
 **máquina BERT** (`maquina_bert`).
 
+## O que mudou (versão atual)
+
+Na primeira versão destas instruções, BERT, BETO e mBERT treinavam todos no corpus
+conjunto (pt+en+es). **Isso mudou:**
+- **BERT-base-cased** treina e é avaliado **só no inglês** (corpus `en`);
+- **BETO** treina e é avaliado **só no espanhol** (corpus `es`);
+- só o **mBERT** usa o corpus conjunto (`multilingual`).
+
+O `jobs.json` e o smoke test do passo 5 já refletem isso. Se você leu a versão antiga
+ou começou a rodar algo com `bert__*__multilingual`:
+1. Pare o processo.
+2. Apague `results/bert__*__multilingual`.
+3. Rode `git pull`.
+4. Recomece pelo passo 4.
+
 ## Contexto
 
 O HubParser é o parser de dependências da dissertação do usuário: um encoder BERT com
 ajuste fino completo, treinado em multi-tarefa (UPOS + DEPREL + HEAD), com cabeçote
-linear ou biaffine. Esta etapa testa o comportamento em outras línguas. Os encoders
-**BERT-base-cased** (inglês), **BETO** (espanhol) e **mBERT** são treinados num
-**corpus multilíngue único**, que junta Porttinari (pt), UD_English-EWT (en) e
-UD_Spanish-AnCora (es) na versão UD r2.18. A avaliação é feita no teste de cada língua.
+linear ou biaffine. Esta etapa testa o comportamento em outras línguas, repetindo o
+desenho da dissertação (encoder monolíngue treinado na própria língua):
+- **BERT-base-cased** treinado e avaliado só no inglês (UD_English-EWT, corpus `en`);
+- **BETO** treinado e avaliado só no espanhol (UD_Spanish-AnCora, corpus `es`);
+- **mBERT** treinado num corpus multilíngue único que junta Porttinari, EWT e AnCora
+  (corpus `multilingual`) e avaliado no teste de cada língua.
+
+Os treebanks de inglês e espanhol estão na versão UD r2.18.
 
 Há três variantes de cabeçote:
 - `linear`: como na dissertação.
@@ -64,14 +83,17 @@ O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparse
    ```bash
    python build_data.py
    ```
-   O esperado é `multilingual {'train': 32724, 'val': 4497, 'test': 5481}`.
+   O esperado é:
+   `en {'train': 12544, 'val': 2001, 'test': 2077}`,
+   `es {'train': 14287, 'val': 1654, 'test': 1721}` e
+   `multilingual {'train': 32724, 'val': 4497, 'test': 5481}`.
 
 5. **Rode o smoke test** (alguns minutos):
    ```bash
-   ENC=beto   # ou bert, conforme a máquina
+   ENC=bert; CORPUS=en     # máquina BERT  (máquina BETO: ENC=beto; CORPUS=es)
    for h in linear biaffine_fix; do
-     python -m hubparser_ml.search --encoder $ENC --head $h --corpus multilingual --smoke &&
-     python -m hubparser_ml.final_train --encoder $ENC --head $h --corpus multilingual --smoke || break
+     python -m hubparser_ml.search --encoder $ENC --head $h --corpus $CORPUS --smoke &&
+     python -m hubparser_ml.final_train --encoder $ENC --head $h --corpus $CORPUS --smoke || break
    done
    rm -rf results/*__smoke runs models
    ```
@@ -108,9 +130,13 @@ O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparse
 
 | Máquina | Fila (em ordem) | Estimativa numa RTX 5090 |
 |---|---|---|
-| `maquina_beto` | BETO (linear, biaffine, biaffine_fix) → mBERT linear → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT, BERTimbau-large) | ~8 dias |
-| `maquina_bert` | BERT-base-cased (linear, biaffine, biaffine_fix) → mBERT biaffine → mBERT biaffine_fix | ~8 dias |
+| `maquina_beto` | BETO no espanhol (linear, biaffine, biaffine_fix) → mBERT linear no corpus conjunto → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT, BERTimbau-large) | ~5–6 dias |
+| `maquina_bert` | BERT-base-cased no inglês (linear, biaffine, biaffine_fix) → mBERT biaffine e biaffine_fix no corpus conjunto | ~4–5 dias |
 
-Cada fold do corpus multilíngue leva cerca de 35–45 min numa RTX 5090, e cada job
-multilíngue tem 50 folds mais um treino final de ~4 h. Em GPUs mais lentas, os tempos
+Numa RTX 5090, os tempos aproximados por fold são:
+- inglês sozinho: ~15 min;
+- espanhol sozinho: ~20 min;
+- corpus conjunto: ~35–45 min.
+
+Cada job tem 50 folds mais um treino final de 1,5 a 4 h. Em GPUs mais lentas, os tempos
 crescem na mesma proporção.
