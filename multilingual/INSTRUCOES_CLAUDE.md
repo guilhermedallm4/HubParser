@@ -9,8 +9,9 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
 1. **Cada encoder monolíngue treina só na própria língua.** BERT-base-cased treina e é
    avaliado só no inglês (corpus `en`), BETO só no espanhol (corpus `es`), e só o mBERT
    usa o corpus conjunto (`multilingual`).
-2. **O biaffine original (`biaffine`, alvo de head desalinhado) não é mais executado.**
-   Ficam apenas os cabeçotes `linear` e `biaffine_fix`.
+2. **O biaffine original (`biaffine`, alvo de head desalinhado) saiu da fila geral.**
+   A fila usa `linear` e `biaffine_fix`; o biaffine original roda só nos dois jobs de
+   comparação do item 6.
 3. **A fila foi redistribuída** (ver `jobs.json`): o BERTimbau-large com `biaffine_fix`
    no PT passou para a máquina BERT.
 4. **O `run_queue.py` relê o `jobs.json` (com `git pull`) antes de cada job.** Mudanças
