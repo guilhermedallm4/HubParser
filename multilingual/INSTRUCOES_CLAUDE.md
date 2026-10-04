@@ -15,6 +15,11 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
    no PT passou para a máquina BERT.
 4. **O `run_queue.py` relê o `jobs.json` (com `git pull`) antes de cada job.** Mudanças
    futuras na fila chegam sozinhas, sem reiniciar.
+5. **A busca usa uma lista fixa de 10 configurações** (`data/search_configs.json`): a
+   sequência do Optuna com seed 42, igual para todos os jobs. Antes, uma reinicialização
+   fazia o Optuna recomeçar a sequência e repetir configurações. A busca agora pula
+   (configuração, fold) já feitos, conta repetições antigas uma vez só, completa as
+   configurações que faltaram e refaz o treino final só se a melhor configuração mudar.
 
 Se você começou a rodar com uma versão antiga:
 1. Pare a fila (`kill` no PID de `logs/queue_<MAQ>.pid` e nos processos `hubparser_ml` filhos).
@@ -49,7 +54,7 @@ A fila também inclui o `biaffine_fix` no português (só Porttinari) para BERTi
 BERTimbau-large, mBERT e JabuticaBERT, para comparar com os biaffine da dissertação.
 
 O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparser_ml/final_train.py`:
-- **Busca:** Optuna TPE com 10 trials × 5 folds sobre train+val, 40 épocas, lote 16, early stopping com paciência 5 e seleção pelo LAS médio de validação. Usa padding dinâmico.
+- **Busca:** 10 configurações fixas (`data/search_configs.json`: os 10 primeiros trials do Optuna TPE com seed 42, que são amostragem aleatória) × 5 folds sobre train+val, 40 épocas, lote 16, early stopping com paciência 5 e seleção pelo LAS médio de validação. Só `learning_rate`, `weight_decay` e `warmup_ratio` são otimizados. Usa padding dinâmico.
 - **Treino final:** seed 42, lote 8, 40 épocas e padding 512. O modelo final é o da época 40.
 - **Avaliação de teste:** decodificação gulosa, Eisner e MST, para cada língua.
 

@@ -1,9 +1,13 @@
-"""Hyperparameter search with the dissertation protocol: Optuna (TPE, 10 trials) x
-5-fold CV over train+val, 40 epochs, batch 16, early stopping (patience 5), best epoch
-by validation LAS. Dynamic padding (same metrics as padding to 512, ~4x faster).
+"""Hyperparameter search with the dissertation protocol: 10 configurations x 5-fold CV
+over train+val, 40 epochs, batch 16, early stopping (patience 5), best epoch by
+validation LAS. Dynamic padding (same metrics as padding to 512, ~4x faster).
+
+The 10 configurations are fixed in data/search_configs.json: they are the first 10
+trials of Optuna's TPESampler(seed=42), which are random samples (TPE only kicks in
+after 10 trials), so every job evaluates exactly the same configurations.
 
 Resumable: every finished fold is appended to results/<job>/folds.jsonl and is never
-re-trained; an interrupted trial is re-run with the same hyperparameters.
+re-trained; a restart continues with the next missing (configuration, fold).
 
 Usage: python -m hubparser_ml.search --encoder beto --head linear --corpus multilingual
 """
@@ -14,7 +18,6 @@ import shutil
 import time
 
 import numpy as np
-import optuna
 import torch
 from datasets import concatenate_datasets
 from sklearn.model_selection import KFold
@@ -23,7 +26,7 @@ from transformers import AutoTokenizer, EarlyStoppingCallback, Trainer, Training
 from .common import (ENCODERS, HEADS, ML_ROOT, build_model, compute_metrics, load_corpus, make_collator,
                      preprocess_logits_for_metrics, seed_everything, tokenize)
 
-N_TRIALS, N_FOLDS = 10, 5
+N_FOLDS = 5
 
 
 def job_name(encoder, head, corpus):
@@ -64,6 +67,17 @@ def run_fold(encoder, head, corpus, full, train_idx, val_idx, hp, tokenizer, out
     return out
 
 
+CONFIGS = json.loads((ML_ROOT / "data" / "search_configs.json").read_text())["configs"]
+
+
+def config_index(hp):
+    """Index of hp in the fixed list of 10 configurations (None if not in it)."""
+    for i, c in enumerate(CONFIGS):
+        if all(c[k] == hp.get(k) for k in ("learning_rate", "weight_decay", "warmup_ratio")):
+            return i
+    return None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--encoder", required=True, choices=list(ENCODERS))
@@ -76,67 +90,49 @@ def main():
     res_dir = ML_ROOT / "results" / name
     res_dir.mkdir(parents=True, exist_ok=True)
     folds_file = res_dir / "folds.jsonl"
+
+    # finished folds, keyed by (configuration index, fold); repeated runs of the same
+    # configuration (from older restarts) are kept in the file but counted once
     done = {}
     if folds_file.exists():
         for line in folds_file.read_text().splitlines():
             r = json.loads(line)
-            done[(r["trial"], r["fold"])] = r
+            ci = config_index(r["hyperparameters"])
+            if ci is not None:
+                done.setdefault((ci, r["fold"]), r)
 
     ds = load_corpus(args.corpus)
     full = concatenate_datasets([ds["train"], ds["val"]])
+    configs = [dict(c) for c in CONFIGS]
     if args.smoke:
         full = full.shuffle(seed=0).select(range(200))
+        configs = [dict(c, num_train_epochs=2) for c in configs[:2]]
     tokenizer = AutoTokenizer.from_pretrained(ENCODERS[args.encoder])
     splits = list(KFold(n_splits=N_FOLDS, shuffle=True, random_state=42).split(np.arange(len(full))))
-    n_trials = 2 if args.smoke else N_TRIALS
 
-    storage = f"sqlite:///{res_dir / 'optuna.db'}"
-    study = optuna.create_study(study_name=name, storage=storage, direction="maximize", load_if_exists=True,
-                                sampler=optuna.samplers.TPESampler(seed=42))
-    # an interrupted trial stays RUNNING: mark it failed and re-run the same hyperparameters
-    for t in study.get_trials(deepcopy=False, states=(optuna.trial.TrialState.RUNNING,)):
-        study._storage.set_trial_state_values(t._trial_id, optuna.trial.TrialState.FAIL)
-        study.enqueue_trial(t.params)
-
-    def n_complete():
-        return len(study.get_trials(states=(optuna.trial.TrialState.COMPLETE,)))
-
-    while n_complete() < n_trials:
-        trial = study.ask()
-        hp = dict(
-            learning_rate=trial.suggest_float("learning_rate", 1e-5, 5e-5, log=True),
-            weight_decay=trial.suggest_float("weight_decay", 0.1, 0.3),
-            warmup_ratio=trial.suggest_float("warmup_ratio", 0.3, 0.5),
-            num_train_epochs=trial.suggest_int("num_train_epochs", 2 if args.smoke else 40, 2 if args.smoke else 40),
-        )
-        # trial index = order of completed trials, stable across restarts
-        tidx = n_complete()
-        las = []
+    for ci, hp in enumerate(configs):
         for fold, (tr, va) in enumerate(splits):
-            key = (tidx, fold)
-            if key in done and done[key]["hyperparameters"] == hp:
-                las.append(done[key]["las"])
+            if (ci, fold) in done:
                 continue
-            print(f"[{name}] trial {tidx} fold {fold} {hp}", flush=True)
+            print(f"[{name}] config {ci} fold {fold} {hp}", flush=True)
             r = run_fold(args.encoder, args.head, args.corpus, full, tr, va, hp, tokenizer, res_dir / "tmp_run")
             rec = dict(job=name, encoder=ENCODERS[args.encoder], head=args.head, corpus=args.corpus,
-                       trial=tidx, fold=fold, hyperparameters=hp, **r)
+                       trial=ci, config=ci, fold=fold, hyperparameters=hp, **r)
             with open(folds_file, "a") as f:
                 f.write(json.dumps(rec) + "\n")
-            done[key] = rec
-            las.append(r["las"])
-            print(f"[{name}] trial {tidx} fold {fold} LAS {r['las']:.4f} ({r['minutes']} min)", flush=True)
-        study.tell(trial, float(np.mean(las)))
+            done[(ci, fold)] = rec
+            print(f"[{name}] config {ci} fold {fold} LAS {r['las']:.4f} ({r['minutes']} min)", flush=True)
 
-    # summary: best trial by mean CV LAS (same rule as the dissertation)
-    rows = {}
-    for r in done.values():
-        rows.setdefault(r["trial"], {"hyperparameters": r["hyperparameters"], "las": []})["las"].append(r["las"])
-    ranking = sorted(({"trial": t, "hyperparameters": v["hyperparameters"], "mean_las": float(np.mean(v["las"])),
-                       "std_las": float(np.std(v["las"], ddof=1)) if len(v["las"]) > 1 else 0.0, "folds": len(v["las"])}
-                      for t, v in rows.items() if len(v["las"]) == N_FOLDS), key=lambda x: -x["mean_las"])
-    (res_dir / "best.json").write_text(json.dumps({"job": name, "best": ranking[0], "ranking": ranking}, indent=2))
-    print(f"[{name}] BEST trial {ranking[0]['trial']} mean LAS {ranking[0]['mean_las']:.4f} {ranking[0]['hyperparameters']}", flush=True)
+    # best configuration by mean CV LAS (same rule as the dissertation)
+    ranking = []
+    for ci, hp in enumerate(configs):
+        las = [done[(ci, f)]["las"] for f in range(N_FOLDS)]
+        ranking.append({"trial": ci, "config": ci, "hyperparameters": hp, "mean_las": float(np.mean(las)),
+                        "std_las": float(np.std(las, ddof=1)), "folds": N_FOLDS})
+    ranking.sort(key=lambda x: -x["mean_las"])
+    (res_dir / "best.json").write_text(json.dumps({"job": name, "n_configs": len(configs), "best": ranking[0],
+                                                   "ranking": ranking}, indent=2))
+    print(f"[{name}] BEST config {ranking[0]['config']} mean LAS {ranking[0]['mean_las']:.4f} {ranking[0]['hyperparameters']}", flush=True)
 
 
 if __name__ == "__main__":

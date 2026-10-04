@@ -28,10 +28,35 @@ def reload_jobs(push):
         subprocess.run(["git", "pull", "-q", "--rebase", "--autostash"], cwd=REPO, check=False)
     JOBS = json.loads((ROOT / "jobs.json").read_text())
 SYNC_EVERY_S = 6 * 3600
+CONFIGS = json.loads((ROOT / "data" / "search_configs.json").read_text())["configs"]
+
+
+def config_index(hp):
+    for i, c in enumerate(CONFIGS):
+        if all(c[k] == hp.get(k) for k in ("learning_rate", "weight_decay", "warmup_ratio")):
+            return i
+    return None
 
 
 def job_name(j):
     return f"{j['encoder']}__{j['head']}__{j['corpus']}"
+
+
+def search_complete(j):
+    """All 10 configurations x 5 folds done (best.json written by the fixed-list search)."""
+    f = ROOT / "results" / job_name(j) / "best.json"
+    return f.exists() and json.loads(f.read_text()).get("n_configs") == 10
+
+
+def final_up_to_date(j):
+    """final.json exists and was trained with the current best configuration."""
+    d = ROOT / "results" / job_name(j)
+    if not (d / "final.json").exists() or not (d / "best.json").exists():
+        return False
+    best = json.loads((d / "best.json").read_text())["best"]["hyperparameters"]
+    used = json.loads((d / "final.json").read_text())["hyperparameters"]
+    keys = ("learning_rate", "weight_decay", "warmup_ratio", "num_train_epochs")
+    return all(best[k] == used[k] for k in keys)
 
 
 def log(msg):
@@ -76,9 +101,19 @@ def status(machines):
         print(f"\n== {m}")
         for j in JOBS[m]:
             d = ROOT / "results" / job_name(j)
-            folds = [json.loads(l) for l in (d / "folds.jsonl").read_text().splitlines()] if (d / "folds.jsonl").exists() else []
-            state = "final pronto" if (d / "final.json").exists() else ("busca pronta" if (d / "best.json").exists() else
-                    (f"busca {len(folds)}/50 folds" if folds else "pendente"))
+            raw = [json.loads(l) for l in (d / "folds.jsonl").read_text().splitlines()] if (d / "folds.jsonl").exists() else []
+            uniq = {}
+            for f in raw:
+                ci = config_index(f["hyperparameters"])
+                if ci is not None:
+                    uniq.setdefault((ci, f["fold"]), dict(f, trial=ci))
+            folds = list(uniq.values())
+            if search_complete(j) and final_up_to_date(j):
+                state = "final pronto"
+            elif search_complete(j):
+                state = "busca pronta"
+            else:
+                state = f"busca {len(folds)}/50 folds" if folds else "pendente"
             mins = [f["minutes"] for f in folds]
             extra = ""
             if folds:
@@ -89,7 +124,7 @@ def status(machines):
                 best = f" melhor LAS médio {max(full.values()):.4f}" if full else ""
                 eta = (50 - len(folds)) * (sum(mins) / len(mins)) / 60
                 extra = f" | {sum(mins) / len(mins):.0f} min/fold, ~{eta:.0f} h restantes na busca{best}"
-            if (d / "final.json").exists():
+            if state == "final pronto":
                 fin = json.loads((d / "final.json").read_text())["test"]
                 extra = " | " + " ".join(f"{l}: LAS {v['las']:.2f}" for l, v in fin["greedy"].items()) + " (gulosa)"
             print(f"  {job_name(j):42s} {state}{extra}")
@@ -111,14 +146,14 @@ def main():
         subprocess.run([sys.executable, "build_data.py"], cwd=ROOT, check=True)
     while True:
         reload_jobs(not args.no_push)
-        pending = [j for j in JOBS[args.machine] if not (ROOT / "results" / job_name(j) / "final.json").exists()]
+        pending = [j for j in JOBS[args.machine] if not search_complete(j) or not final_up_to_date(j)]
         if not pending:
             break
         j = pending[0]
-        d = ROOT / "results" / job_name(j)
-        if not (d / "best.json").exists():
+        if not search_complete(j):
             run_step("search", j, not args.no_push, args.machine)
-        run_step("final_train", j, not args.no_push, args.machine)
+        if not final_up_to_date(j):
+            run_step("final_train", j, not args.no_push, args.machine)
     log("queue finished")
     status([args.machine])
 

@@ -1,0 +1,65 @@
+{
+ "_comment": "As 10 configura\u00e7\u00f5es da busca: sequ\u00eancia do Optuna TPESampler(seed=42) (os 10 primeiros trials do TPE s\u00e3o amostragem aleat\u00f3ria). Intervalos: learning_rate 1e-5..5e-5 (log), weight_decay 0.1..0.3, warmup_ratio 0.3..0.5; 40 \u00e9pocas.",
+ "configs": [
+  {
+   "learning_rate": 1.827226177606625e-05,
+   "weight_decay": 0.2901428612819832,
+   "warmup_ratio": 0.446398788362281,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 2.620863021537753e-05,
+   "weight_decay": 0.1312037280884873,
+   "warmup_ratio": 0.3311989040672405,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 1.097990803659665e-05,
+   "weight_decay": 0.273235229154987,
+   "warmup_ratio": 0.42022300234864174,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 3.12551431816761e-05,
+   "weight_decay": 0.10411689885916049,
+   "warmup_ratio": 0.4939819704323989,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 3.818145165896868e-05,
+   "weight_decay": 0.14246782213565523,
+   "warmup_ratio": 0.3363649934414201,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 1.34336568680343e-05,
+   "weight_decay": 0.16084844859190756,
+   "warmup_ratio": 0.40495128632644756,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 2.0040871876541563e-05,
+   "weight_decay": 0.15824582803960838,
+   "warmup_ratio": 0.4223705789444759,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 1.251705107614021e-05,
+   "weight_decay": 0.15842892970704364,
+   "warmup_ratio": 0.37327236865873836,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 2.083431561152948e-05,
+   "weight_decay": 0.2570351922786027,
+   "warmup_ratio": 0.3399347564316719,
+   "num_train_epochs": 40
+  },
+  {
+   "learning_rate": 2.2878863522445918e-05,
+   "weight_decay": 0.21848291377240847,
+   "warmup_ratio": 0.30929008254399953,
+   "num_train_epochs": 40
+  }
+ ]
+}
