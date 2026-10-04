@@ -1,5 +1,5 @@
 {
-  "_comment": "Fila de cada máquina, relida (com git pull) antes de cada job por run_queue.py. Cada job = busca Optuna (10 trials x 5 folds) + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix. O biaffine original (alvo desalinhado) roda só no BETO-es e no BERT-en, como comparação com a correção.",
+  "_comment": "Filas executadas por run_queue.py, que relê este arquivo (com git pull) antes de cada job. Cada máquina roda primeiro a própria fila; quando ela acaba, pega o próximo job livre de 'compartilhado' (mBERT primeiro), reservando-o com results/<job>/CLAIM no git. Cada job = 10 configurações x 5 folds + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix; o biaffine original roda só no BETO-es e no BERT-en, como comparação.",
   "maquina_beto": [
     {
       "encoder": "beto",
@@ -15,26 +15,6 @@
       "encoder": "beto",
       "head": "biaffine",
       "corpus": "es"
-    },
-    {
-      "encoder": "mbert",
-      "head": "linear",
-      "corpus": "multilingual"
-    },
-    {
-      "encoder": "bertimbau-base",
-      "head": "biaffine_fix",
-      "corpus": "pt"
-    },
-    {
-      "encoder": "mbert",
-      "head": "biaffine_fix",
-      "corpus": "pt"
-    },
-    {
-      "encoder": "jabuticabert",
-      "head": "biaffine_fix",
-      "corpus": "pt"
     }
   ],
   "maquina_bert": [
@@ -52,11 +32,33 @@
       "encoder": "bert",
       "head": "biaffine",
       "corpus": "en"
+    }
+  ],
+  "compartilhado": [
+    {
+      "encoder": "mbert",
+      "head": "linear",
+      "corpus": "multilingual"
     },
     {
       "encoder": "mbert",
       "head": "biaffine_fix",
       "corpus": "multilingual"
+    },
+    {
+      "encoder": "bertimbau-base",
+      "head": "biaffine_fix",
+      "corpus": "pt"
+    },
+    {
+      "encoder": "mbert",
+      "head": "biaffine_fix",
+      "corpus": "pt"
+    },
+    {
+      "encoder": "jabuticabert",
+      "head": "biaffine_fix",
+      "corpus": "pt"
     },
     {
       "encoder": "bertimbau-large",

@@ -24,6 +24,19 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
 6. **O biaffine original voltou, mas só como comparação:** `beto__biaffine__es` e
    `bert__biaffine__en` entram na fila logo depois do `biaffine_fix` da mesma língua.
    Veja a seção "Desenho da comparação".
+7. **Pool compartilhado: quem terminar primeiro executa o mBERT.** Cada máquina roda
+   primeiro só a própria fila (BETO-es ou BERT-en, com os três cabeçotes). Quando ela
+   acaba, pega o próximo job livre de `compartilhado` no `jobs.json`, nesta ordem:
+   1. mBERT linear no corpus conjunto;
+   2. mBERT biaffine_fix no corpus conjunto;
+   3. os biaffine_fix no PT.
+
+   Antes de começar, a máquina reserva o job com o arquivo `results/<job>/CLAIM`
+   (commit + push). Se as duas tentarem ao mesmo tempo, o git aceita só uma reserva, e a
+   outra máquina passa para o job seguinte. Um job reservado só é executado pela dona da
+   reserva, inclusive quando ela é reiniciada. Para liberar a reserva de uma máquina que
+   deixou de existir, apague o `CLAIM` desse job e faça push; só faça isso com
+   autorização do usuário.
 
 Se você começou a rodar com uma versão antiga:
 1. Pare a fila (`kill` no PID de `logs/queue_<MAQ>.pid` e nos processos `hubparser_ml` filhos).
@@ -173,10 +186,14 @@ validação cruzada, e comparar de novo.
 
 ## Divisão do trabalho (`jobs.json`)
 
-| Máquina | Fila (em ordem) | Estimativa numa RTX 5090 |
+| Fila | Jobs (em ordem) | Quem executa |
 |---|---|---|
-| `maquina_beto` | BETO no espanhol (linear, biaffine_fix, biaffine) → mBERT linear no corpus conjunto → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | ~3,5 dias |
-| `maquina_bert` | BERT-base-cased no inglês (linear, biaffine_fix, biaffine) → mBERT biaffine_fix no corpus conjunto → biaffine_fix PT (BERTimbau-large) | ~3–3,5 dias |
+| `maquina_beto` | BETO no espanhol: linear → biaffine_fix → biaffine | máquina BETO |
+| `maquina_bert` | BERT-base-cased no inglês: linear → biaffine_fix → biaffine | máquina BERT |
+| `compartilhado` | mBERT linear (conjunto) → mBERT biaffine_fix (conjunto) → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT, BERTimbau-large) | a primeira máquina livre pega o próximo job, reservando-o com `CLAIM` |
+
+`run_queue.py --status` mostra as três filas e, no `compartilhado`, quem reservou cada
+job (`[maquina_...]`) ou `[livre]`.
 
 Tempos medidos numa RTX 5090, por fold:
 - espanhol: ~15 min;

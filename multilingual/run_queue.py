@@ -28,6 +28,7 @@ def reload_jobs(push):
         subprocess.run(["git", "pull", "-q", "--rebase", "--autostash"], cwd=REPO, check=False)
     JOBS = json.loads((ROOT / "jobs.json").read_text())
 SYNC_EVERY_S = 6 * 3600
+POOL = "compartilhado"  # jobs taken by whichever machine finishes its own queue first
 CONFIGS = json.loads((ROOT / "data" / "search_configs.json").read_text())["configs"]
 
 
@@ -73,6 +74,60 @@ def git_sync(message, push=True):
         subprocess.run(["git", "pull", "-q", "--rebase", "--autostash"], cwd=REPO, check=False)
         r = subprocess.run(["git", "push", "-q"], cwd=REPO, check=False)
         log("git push ok" if r.returncode == 0 else "git push FAILED (results stay committed locally)")
+
+
+def claim_owner(j):
+    f = ROOT / "results" / job_name(j) / "CLAIM"
+    return f.read_text().strip() if f.exists() else None
+
+
+def git(*args):
+    return subprocess.run(["git", *args], cwd=REPO, capture_output=True, text=True).returncode
+
+
+def try_claim(j, machine, push):
+    """Reserve a shared-pool job by committing results/<job>/CLAIM and pushing it.
+    If the other machine pushed a claim for the same job first, the rebase conflicts on
+    CLAIM: our claim is dropped and the job stays with the other machine."""
+    owner = claim_owner(j)
+    if owner:
+        return owner == machine
+    f = ROOT / "results" / job_name(j) / "CLAIM"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(machine + "\n")
+    if not push:
+        return True
+    rel = str(f.relative_to(REPO))
+    git("add", rel)
+    git("commit", "-q", "-m", f"multilingual: {machine} reserva {job_name(j)}")
+    for _ in range(5):
+        if git("push", "-q") == 0:
+            return True
+        if git("pull", "-q", "--rebase") != 0:          # conflict: the other machine claimed it
+            git("rebase", "--abort")
+            git("reset", "-q", "--keep", "HEAD~1")       # drop our claim commit
+            git("pull", "-q", "--rebase", "--autostash")
+            return claim_owner(j) == machine
+        if claim_owner(j) != machine:                    # defensive: claim replaced upstream
+            return False
+        time.sleep(5)
+    log(f"could not push the claim for {job_name(j)}; will retry later")
+    git("reset", "-q", "--keep", "HEAD~1")
+    f.unlink(missing_ok=True)
+    return False
+
+
+def next_pool_job(machine, push):
+    for j in JOBS.get(POOL, []):
+        if search_complete(j) and final_up_to_date(j):
+            continue
+        owner = claim_owner(j)
+        if owner == machine:
+            return j
+        if owner is None and try_claim(j, machine, push):
+            log(f"claimed {job_name(j)} from the shared pool")
+            return j
+    return None
 
 
 def run_step(module, j, push, machine):
@@ -127,16 +182,19 @@ def status(machines):
             if state == "final pronto":
                 fin = json.loads((d / "final.json").read_text())["test"]
                 extra = " | " + " ".join(f"{l}: LAS {v['las']:.2f}" for l, v in fin["greedy"].items()) + " (gulosa)"
-            print(f"  {job_name(j):42s} {state}{extra}")
+            owner = f" [{claim_owner(j)}]" if m == POOL and claim_owner(j) else (" [livre]" if m == POOL else "")
+            print(f"  {job_name(j):42s} {state}{owner}{extra}")
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--machine", choices=[k for k in JOBS if not k.startswith("_")])
+    ap.add_argument("--machine", choices=[k for k in JOBS if not k.startswith("_") and k != POOL])
     ap.add_argument("--status", action="store_true")
     ap.add_argument("--no-push", action="store_true", help="commit results locally without pushing")
     args = ap.parse_args()
     machines = [args.machine] if args.machine else [k for k in JOBS if not k.startswith("_")]
+    if args.machine and POOL in JOBS:
+        machines.append(POOL)
     if args.status:
         status(machines)
         return
@@ -147,15 +205,15 @@ def main():
     while True:
         reload_jobs(not args.no_push)
         pending = [j for j in JOBS[args.machine] if not search_complete(j) or not final_up_to_date(j)]
-        if not pending:
+        j = pending[0] if pending else next_pool_job(args.machine, not args.no_push)
+        if j is None:
             break
-        j = pending[0]
         if not search_complete(j):
             run_step("search", j, not args.no_push, args.machine)
         if not final_up_to_date(j):
             run_step("final_train", j, not args.no_push, args.machine)
     log("queue finished")
-    status([args.machine])
+    status([args.machine, POOL] if POOL in JOBS else [args.machine])
 
 
 if __name__ == "__main__":
