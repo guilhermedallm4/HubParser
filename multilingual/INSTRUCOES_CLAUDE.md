@@ -12,8 +12,8 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
 2. **O biaffine original (`biaffine`, alvo de head desalinhado) saiu da fila geral.**
    A fila usa `linear` e `biaffine_fix`; o biaffine original roda só nos dois jobs de
    comparação do item 6.
-3. **A fila foi redistribuída** (ver `jobs.json`): o BERTimbau-large com `biaffine_fix`
-   no PT passou para a máquina BERT.
+3. **Só encoders de porte base** (ver `jobs.json`): o BERTimbau-large saiu da fila, para
+   a comparação entre BERT, BETO, mBERT e BERTimbau-base ser justa.
 4. **O `run_queue.py` relê o `jobs.json` (com `git pull`) antes de cada job.** Mudanças
    futuras na fila chegam sozinhas, sem reiniciar.
 5. **A busca usa uma lista fixa de 10 configurações** (`data/search_configs.json`): a
@@ -70,7 +70,7 @@ em dois jobs, `beto__biaffine__es` (máquina BETO) e `bert__biaffine__en` (máqu
 como comparação direta com o `biaffine_fix`.
 
 A fila também inclui o `biaffine_fix` no português (só Porttinari) para BERTimbau-base,
-BERTimbau-large, mBERT e JabuticaBERT, para comparar com os biaffine da dissertação.
+mBERT e JabuticaBERT (todos de porte base), para comparar com os biaffine da dissertação.
 
 O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparser_ml/final_train.py`:
 - **Busca:** 10 configurações fixas (`data/search_configs.json`: os 10 primeiros trials do Optuna TPE com seed 42, que são amostragem aleatória) × 5 folds sobre train+val, 40 épocas, lote 16, early stopping com paciência 5 e seleção pelo LAS médio de validação. Só `learning_rate`, `weight_decay` e `warmup_ratio` são otimizados. Usa padding dinâmico.
@@ -190,7 +190,7 @@ validação cruzada, e comparar de novo.
 |---|---|---|
 | `maquina_beto` | BETO no espanhol: linear → biaffine_fix → biaffine | máquina BETO |
 | `maquina_bert` | BERT-base-cased no inglês: linear → biaffine_fix → biaffine | máquina BERT |
-| `compartilhado` | mBERT linear (conjunto) → mBERT biaffine_fix (conjunto) → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT, BERTimbau-large) | a primeira máquina livre pega o próximo job, reservando-o com `CLAIM` |
+| `compartilhado` | mBERT linear (conjunto) → mBERT biaffine_fix (conjunto) → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | a primeira máquina livre pega o próximo job, reservando-o com `CLAIM` |
 
 `run_queue.py --status` mostra as três filas e, no `compartilhado`, quem reservou cada
 job (`[maquina_...]`) ou `[livre]`.
@@ -201,7 +201,7 @@ Tempos medidos numa RTX 5090, por fold:
 
 Tempos estimados, por fold:
 - inglês: ~10 min;
-- Porttinari: ~4 min com encoder base e ~12 min com o large.
+- Porttinari: ~4 min com encoder base.
 
 Cada job tem 50 folds mais um treino final de 0,7 a 4 h. Em GPUs mais lentas, os tempos
 crescem na mesma proporção.

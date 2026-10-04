@@ -59,11 +59,6 @@
       "encoder": "jabuticabert",
       "head": "biaffine_fix",
       "corpus": "pt"
-    },
-    {
-      "encoder": "bertimbau-large",
-      "head": "biaffine_fix",
-      "corpus": "pt"
     }
   ]
 }
