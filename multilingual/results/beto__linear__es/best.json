@@ -1,7 +1,9 @@
 {
   "job": "beto__linear__es",
+  "n_configs": 10,
   "best": {
-    "trial": 6,
+    "trial": 4,
+    "config": 4,
     "hyperparameters": {
       "learning_rate": 3.818145165896868e-05,
       "weight_decay": 0.14246782213565523,
@@ -14,7 +16,8 @@
   },
   "ranking": [
     {
-      "trial": 6,
+      "trial": 4,
+      "config": 4,
       "hyperparameters": {
         "learning_rate": 3.818145165896868e-05,
         "weight_decay": 0.14246782213565523,
@@ -26,7 +29,8 @@
       "folds": 5
     },
     {
-      "trial": 5,
+      "trial": 3,
+      "config": 3,
       "hyperparameters": {
         "learning_rate": 3.12551431816761e-05,
         "weight_decay": 0.10411689885916049,
@@ -38,19 +42,8 @@
       "folds": 5
     },
     {
-      "trial": 3,
-      "hyperparameters": {
-        "learning_rate": 2.620863021537753e-05,
-        "weight_decay": 0.1312037280884873,
-        "warmup_ratio": 0.3311989040672405,
-        "num_train_epochs": 40
-      },
-      "mean_las": 0.8893098053212143,
-      "std_las": 0.0020455591603707316,
-      "folds": 5
-    },
-    {
       "trial": 1,
+      "config": 1,
       "hyperparameters": {
         "learning_rate": 2.620863021537753e-05,
         "weight_decay": 0.1312037280884873,
@@ -62,7 +55,34 @@
       "folds": 5
     },
     {
+      "trial": 9,
+      "config": 9,
+      "hyperparameters": {
+        "learning_rate": 2.2878863522445918e-05,
+        "weight_decay": 0.21848291377240847,
+        "warmup_ratio": 0.30929008254399953,
+        "num_train_epochs": 40
+      },
+      "mean_las": 0.8870512516327956,
+      "std_las": 0.0030631250478330113,
+      "folds": 5
+    },
+    {
       "trial": 8,
+      "config": 8,
+      "hyperparameters": {
+        "learning_rate": 2.083431561152948e-05,
+        "weight_decay": 0.2570351922786027,
+        "warmup_ratio": 0.3399347564316719,
+        "num_train_epochs": 40
+      },
+      "mean_las": 0.8847734703133732,
+      "std_las": 0.002931412986264716,
+      "folds": 5
+    },
+    {
+      "trial": 6,
+      "config": 6,
       "hyperparameters": {
         "learning_rate": 2.0040871876541563e-05,
         "weight_decay": 0.15824582803960838,
@@ -75,6 +95,7 @@
     },
     {
       "trial": 0,
+      "config": 0,
       "hyperparameters": {
         "learning_rate": 1.827226177606625e-05,
         "weight_decay": 0.2901428612819832,
@@ -86,19 +107,8 @@
       "folds": 5
     },
     {
-      "trial": 2,
-      "hyperparameters": {
-        "learning_rate": 1.827226177606625e-05,
-        "weight_decay": 0.2901428612819832,
-        "warmup_ratio": 0.446398788362281,
-        "num_train_epochs": 40
-      },
-      "mean_las": 0.882375557216682,
-      "std_las": 0.003009404877248757,
-      "folds": 5
-    },
-    {
-      "trial": 7,
+      "trial": 5,
+      "config": 5,
       "hyperparameters": {
         "learning_rate": 1.34336568680343e-05,
         "weight_decay": 0.16084844859190756,
@@ -110,7 +120,8 @@
       "folds": 5
     },
     {
-      "trial": 9,
+      "trial": 7,
+      "config": 7,
       "hyperparameters": {
         "learning_rate": 1.251705107614021e-05,
         "weight_decay": 0.15842892970704364,
@@ -122,7 +133,8 @@
       "folds": 5
     },
     {
-      "trial": 4,
+      "trial": 2,
+      "config": 2,
       "hyperparameters": {
         "learning_rate": 1.097990803659665e-05,
         "weight_decay": 0.273235229154987,
