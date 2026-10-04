@@ -19,6 +19,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parent
 JOBS = json.loads((ROOT / "jobs.json").read_text())
+
+
+def reload_jobs(push):
+    """Pick up queue changes pushed from the other machine before starting each job."""
+    global JOBS
+    if push:
+        subprocess.run(["git", "pull", "-q", "--rebase", "--autostash"], cwd=REPO, check=False)
+    JOBS = json.loads((ROOT / "jobs.json").read_text())
 SYNC_EVERY_S = 6 * 3600
 
 
@@ -101,12 +109,16 @@ def main():
     if not (ROOT / "data" / "built" / "hubparser_multilingual").exists():
         log("building datasets")
         subprocess.run([sys.executable, "build_data.py"], cwd=ROOT, check=True)
-    for j in JOBS[args.machine]:
+    while True:
+        reload_jobs(not args.no_push)
+        pending = [j for j in JOBS[args.machine] if not (ROOT / "results" / job_name(j) / "final.json").exists()]
+        if not pending:
+            break
+        j = pending[0]
         d = ROOT / "results" / job_name(j)
         if not (d / "best.json").exists():
             run_step("search", j, not args.no_push, args.machine)
-        if not (d / "final.json").exists():
-            run_step("final_train", j, not args.no_push, args.machine)
+        run_step("final_train", j, not args.no_push, args.machine)
     log("queue finished")
     status([args.machine])
 

@@ -6,18 +6,22 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
 
 ## O que mudou (versão atual)
 
-Na primeira versão destas instruções, BERT, BETO e mBERT treinavam todos no corpus
-conjunto (pt+en+es). **Isso mudou:**
-- **BERT-base-cased** treina e é avaliado **só no inglês** (corpus `en`);
-- **BETO** treina e é avaliado **só no espanhol** (corpus `es`);
-- só o **mBERT** usa o corpus conjunto (`multilingual`).
+1. **Cada encoder monolíngue treina só na própria língua.** BERT-base-cased treina e é
+   avaliado só no inglês (corpus `en`), BETO só no espanhol (corpus `es`), e só o mBERT
+   usa o corpus conjunto (`multilingual`).
+2. **O biaffine original (`biaffine`, alvo de head desalinhado) não é mais executado.**
+   Ficam apenas os cabeçotes `linear` e `biaffine_fix`.
+3. **A fila foi redistribuída** (ver `jobs.json`): o BERTimbau-large com `biaffine_fix`
+   no PT passou para a máquina BERT.
+4. **O `run_queue.py` relê o `jobs.json` (com `git pull`) antes de cada job.** Mudanças
+   futuras na fila chegam sozinhas, sem reiniciar.
 
-O `jobs.json` e o smoke test do passo 5 já refletem isso. Se você leu a versão antiga
-ou começou a rodar algo com `bert__*__multilingual`:
-1. Pare o processo.
-2. Apague `results/bert__*__multilingual`.
+Se você começou a rodar com uma versão antiga:
+1. Pare a fila (`kill` no PID de `logs/queue_<MAQ>.pid` e nos processos `hubparser_ml` filhos).
+2. Apague só as pastas de jobs que não existem mais no `jobs.json`, como
+   `results/bert__*__multilingual` ou `results/*__biaffine__*`.
 3. Rode `git pull`.
-4. Recomece pelo passo 4.
+4. Inicie a fila de novo (passo 6). Os jobs atuais retomam do ponto onde pararam.
 
 ## Contexto
 
@@ -32,13 +36,17 @@ desenho da dissertação (encoder monolíngue treinado na própria língua):
 
 Os treebanks de inglês e espanhol estão na versão UD r2.18.
 
-Há três variantes de cabeçote:
+São executadas duas variantes de cabeçote:
 - `linear`: como na dissertação.
-- `biaffine`: como na dissertação. O alvo do head é o índice da palavra, usado como posição na sequência.
-- `biaffine_fix`: corrigido. O alvo do head é o primeiro subtoken da palavra-head, e a raiz é o `[CLS]`.
+- `biaffine_fix`: biaffine com o alvo de head corrigido, no primeiro subtoken da
+  palavra-head, e com a raiz no `[CLS]`.
+
+O código ainda aceita `biaffine`, o biaffine original da dissertação, cujo alvo de head é
+o índice da palavra usado como posição na sequência. Ele tem esse desalinhamento e não
+está na fila.
 
 A fila também inclui o `biaffine_fix` no português (só Porttinari) para BERTimbau-base,
-BERTimbau-large, mBERT e JabuticaBERT.
+BERTimbau-large, mBERT e JabuticaBERT, para comparar com os biaffine da dissertação.
 
 O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparser_ml/final_train.py`:
 - **Busca:** Optuna TPE com 10 trials × 5 folds sobre train+val, 40 épocas, lote 16, early stopping com paciência 5 e seleção pelo LAS médio de validação. Usa padding dinâmico.
@@ -130,13 +138,16 @@ O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparse
 
 | Máquina | Fila (em ordem) | Estimativa numa RTX 5090 |
 |---|---|---|
-| `maquina_beto` | BETO no espanhol (linear, biaffine, biaffine_fix) → mBERT linear no corpus conjunto → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT, BERTimbau-large) | ~5–6 dias |
-| `maquina_bert` | BERT-base-cased no inglês (linear, biaffine, biaffine_fix) → mBERT biaffine e biaffine_fix no corpus conjunto | ~4–5 dias |
+| `maquina_beto` | BETO no espanhol (linear, biaffine_fix) → mBERT linear no corpus conjunto → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | ~3 dias |
+| `maquina_bert` | BERT-base-cased no inglês (linear, biaffine_fix) → mBERT biaffine_fix no corpus conjunto → biaffine_fix PT (BERTimbau-large) | ~2,5–3 dias |
 
-Numa RTX 5090, os tempos aproximados por fold são:
-- inglês sozinho: ~15 min;
-- espanhol sozinho: ~20 min;
-- corpus conjunto: ~35–45 min.
+Tempos medidos numa RTX 5090, por fold:
+- espanhol: ~15 min;
+- corpus conjunto: ~33 min.
 
-Cada job tem 50 folds mais um treino final de 1,5 a 4 h. Em GPUs mais lentas, os tempos
+Tempos estimados, por fold:
+- inglês: ~10 min;
+- Porttinari: ~4 min com encoder base e ~12 min com o large.
+
+Cada job tem 50 folds mais um treino final de 0,7 a 4 h. Em GPUs mais lentas, os tempos
 crescem na mesma proporção.
