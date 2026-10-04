@@ -1,5 +1,5 @@
 {
-  "_comment": "Fila de cada máquina, relida (com git pull) antes de cada job por run_queue.py. Cada job = busca Optuna (10 trials x 5 folds) + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix. O biaffine original (alvo desalinhado) roda só no BETO-es, como comparação com a correção.",
+  "_comment": "Fila de cada máquina, relida (com git pull) antes de cada job por run_queue.py. Cada job = busca Optuna (10 trials x 5 folds) + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix. O biaffine original (alvo desalinhado) roda só no BETO-es e no BERT-en, como comparação com a correção.",
   "maquina_beto": [
     {
       "encoder": "beto",
@@ -46,6 +46,11 @@
     {
       "encoder": "bert",
       "head": "biaffine_fix",
+      "corpus": "en"
+    },
+    {
+      "encoder": "bert",
+      "head": "biaffine",
       "corpus": "en"
     },
     {

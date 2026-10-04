@@ -20,11 +20,15 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
    fazia o Optuna recomeçar a sequência e repetir configurações. A busca agora pula
    (configuração, fold) já feitos, conta repetições antigas uma vez só, completa as
    configurações que faltaram e refaz o treino final só se a melhor configuração mudar.
+6. **O biaffine original voltou, mas só como comparação:** `beto__biaffine__es` e
+   `bert__biaffine__en` entram na fila logo depois do `biaffine_fix` da mesma língua.
+   Veja a seção "Desenho da comparação".
 
 Se você começou a rodar com uma versão antiga:
 1. Pare a fila (`kill` no PID de `logs/queue_<MAQ>.pid` e nos processos `hubparser_ml` filhos).
-2. Apague só as pastas de jobs que não existem mais no `jobs.json`, como
-   `results/bert__*__multilingual` ou `results/*__biaffine__*`.
+2. Apague só as pastas de `results/` cujo job não exista no `jobs.json` atual, como
+   `results/bert__*__multilingual`. **Não** apague `bert__biaffine__en` nem
+   `beto__biaffine__es`, que são jobs válidos da fila.
 3. Rode `git pull`.
 4. Inicie a fila de novo (passo 6). Os jobs atuais retomam do ponto onde pararam.
 
@@ -46,10 +50,10 @@ São executadas duas variantes de cabeçote:
 - `biaffine_fix`: biaffine com o alvo de head corrigido, no primeiro subtoken da
   palavra-head, e com a raiz no `[CLS]`.
 
-O código ainda aceita `biaffine`, o biaffine original da dissertação, cujo alvo de head é
-o índice da palavra usado como posição na sequência. Por causa desse desalinhamento, ele
-roda só num job (`beto__biaffine__es`, na máquina BETO), como comparação direta com o
-`biaffine_fix`.
+Também roda o `biaffine`, o biaffine original da dissertação, cujo alvo de head é o índice
+da palavra usado como posição na sequência. Por causa desse desalinhamento, ele roda só
+em dois jobs, `beto__biaffine__es` (máquina BETO) e `bert__biaffine__en` (máquina BERT),
+como comparação direta com o `biaffine_fix`.
 
 A fila também inclui o `biaffine_fix` no português (só Porttinari) para BERTimbau-base,
 BERTimbau-large, mBERT e JabuticaBERT, para comparar com os biaffine da dissertação.
@@ -65,6 +69,32 @@ O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparse
 - **Commits:** só o usuário aparece como autor. **Não** adicione `Co-Authored-By: Claude` nem qualquer outra atribuição ao Claude ou à Anthropic.
 - O `run_queue.py` faz commit e push apenas de `multilingual/results/`. Não faça commit de dados, checkpoints ou modelos (eles estão no `.gitignore`).
 - Não apague `multilingual/results/` nem `optuna.db`, porque é isso que permite retomar a execução.
+
+## Desenho da comparação (análise prévia)
+
+Esta rodada é uma **análise prévia do comportamento** dos cabeçotes e das decodificações.
+Mais tarde, o usuário vai treinar com as partições oficiais do UD (train/dev/test), sem
+validação cruzada, e comparar de novo.
+
+- **Mesmas configurações e folds para os três cabeçotes.** Em cada língua, `linear`,
+  `biaffine` e `biaffine_fix` usam as mesmas 10 configurações e os mesmos 5 folds e
+  diferem só no cabeçote. Assim dá para comparar:
+  - `linear` × `biaffine`: o que a dissertação comparou;
+  - `biaffine` × `biaffine_fix`: o efeito isolado do bug;
+  - `linear` × `biaffine_fix`: a comparação justa.
+- **Um job por vez, nunca em paralelo.** Em cada máquina, os jobs rodam em sequência, na
+  ordem do `jobs.json`. A GPU já fica saturada com um treino só.
+- **O teste não entra na seleção.**
+  - A validação cruzada usa só treino + validação: cada fold treina em 80% e é avaliado
+    nos outros 20%.
+  - A melhor configuração é a de maior LAS médio nos 5 folds de validação.
+  - O teste é usado uma única vez por job, no treino final, depois de a configuração ter
+    sido escolhida.
+- **Decodificações só para análise.** O modelo final é avaliado no teste com gulosa, Eisner
+  e MST apenas para medir o impacto da decodificação. Nenhuma decodificação é escolhida
+  olhando o teste; essa comparação será feita depois, separadamente.
+- **Não rode testes extras na GPU** enquanto a fila estiver rodando sem pedir ao usuário,
+  porque eles dividem a GPU e atrasam o treino.
 
 ## Passo a passo
 
@@ -144,8 +174,8 @@ O protocolo é o mesmo da dissertação, em `hubparser_ml/search.py` e `hubparse
 
 | Máquina | Fila (em ordem) | Estimativa numa RTX 5090 |
 |---|---|---|
-| `maquina_beto` | BETO no espanhol (linear, biaffine_fix) → mBERT linear no corpus conjunto → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | ~3 dias |
-| `maquina_bert` | BERT-base-cased no inglês (linear, biaffine_fix) → mBERT biaffine_fix no corpus conjunto → biaffine_fix PT (BERTimbau-large) | ~2,5–3 dias |
+| `maquina_beto` | BETO no espanhol (linear, biaffine_fix, biaffine) → mBERT linear no corpus conjunto → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | ~3,5 dias |
+| `maquina_bert` | BERT-base-cased no inglês (linear, biaffine_fix, biaffine) → mBERT biaffine_fix no corpus conjunto → biaffine_fix PT (BERTimbau-large) | ~3–3,5 dias |
 
 Tempos medidos numa RTX 5090, por fold:
 - espanhol: ~15 min;
