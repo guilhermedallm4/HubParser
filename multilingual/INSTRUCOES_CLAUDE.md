@@ -10,7 +10,7 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
    avaliado só no inglês (corpus `en`), BETO só no espanhol (corpus `es`), e só o mBERT
    usa o corpus conjunto (`multilingual`).
 2. **O biaffine original (`biaffine`, alvo de head desalinhado) saiu da fila geral.**
-   A fila usa `linear` e `biaffine_fix`; o biaffine original roda só nos dois jobs de
+   A fila usa `linear` e `biaffine_fix`; o biaffine original roda só nos três jobs de
    comparação do item 6.
 3. **Só encoders de porte base** (ver `jobs.json`): o BERTimbau-large saiu da fila, para
    a comparação entre BERT, BETO, mBERT e BERTimbau-base ser justa.
@@ -21,15 +21,17 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
    fazia o Optuna recomeçar a sequência e repetir configurações. A busca agora pula
    (configuração, fold) já feitos, conta repetições antigas uma vez só, completa as
    configurações que faltaram e refaz o treino final só se a melhor configuração mudar.
-6. **O biaffine original voltou, mas só como comparação:** `beto__biaffine__es` e
-   `bert__biaffine__en` entram na fila logo depois do `biaffine_fix` da mesma língua.
+6. **O biaffine original voltou, mas só como comparação:** `beto__biaffine__es`,
+   `bert__biaffine__en` e `mbert__biaffine__multilingual` entram na fila logo depois do
+   `biaffine_fix` do mesmo encoder e corpus.
    Veja a seção "Desenho da comparação".
 7. **Pool compartilhado: quem terminar primeiro executa o mBERT.** Cada máquina roda
    primeiro só a própria fila (BETO-es ou BERT-en, com os três cabeçotes). Quando ela
    acaba, pega o próximo job livre de `compartilhado` no `jobs.json`, nesta ordem:
    1. mBERT linear no corpus conjunto;
    2. mBERT biaffine_fix no corpus conjunto;
-   3. os biaffine_fix no PT.
+   3. mBERT biaffine original no corpus conjunto;
+   4. os biaffine_fix no PT.
 
    Antes de começar, a máquina reserva o job com o arquivo `results/<job>/CLAIM`
    (commit + push). Se as duas tentarem ao mesmo tempo, o git aceita só uma reserva, e a
@@ -66,8 +68,9 @@ São executadas duas variantes de cabeçote:
 
 Também roda o `biaffine`, o biaffine original da dissertação, cujo alvo de head é o índice
 da palavra usado como posição na sequência. Por causa desse desalinhamento, ele roda só
-em dois jobs, `beto__biaffine__es` (máquina BETO) e `bert__biaffine__en` (máquina BERT),
-como comparação direta com o `biaffine_fix`.
+em três jobs, `beto__biaffine__es` (máquina BETO), `bert__biaffine__en` (máquina BERT) e
+`mbert__biaffine__multilingual` (pool compartilhado), como comparação direta com o
+`biaffine_fix`.
 
 A fila também inclui o `biaffine_fix` no português (só Porttinari) para BERTimbau-base,
 mBERT e JabuticaBERT (todos de porte base), para comparar com os biaffine da dissertação.
@@ -190,7 +193,7 @@ validação cruzada, e comparar de novo.
 |---|---|---|
 | `maquina_beto` | BETO no espanhol: linear → biaffine_fix → biaffine | máquina BETO |
 | `maquina_bert` | BERT-base-cased no inglês: linear → biaffine_fix → biaffine | máquina BERT |
-| `compartilhado` | mBERT linear (conjunto) → mBERT biaffine_fix (conjunto) → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | a primeira máquina livre pega o próximo job, reservando-o com `CLAIM` |
+| `compartilhado` | mBERT linear (conjunto) → mBERT biaffine_fix (conjunto) → mBERT biaffine original (conjunto) → biaffine_fix PT (BERTimbau-base, mBERT, JabuticaBERT) | a primeira máquina livre pega o próximo job, reservando-o com `CLAIM` |
 
 `run_queue.py --status` mostra as três filas e, no `compartilhado`, quem reservou cada
 job (`[maquina_...]`) ou `[livre]`.
