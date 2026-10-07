@@ -1,11 +1,11 @@
 # Progresso — `maquina_beto`
 
-Atualizado em **07/10/2026 12:03** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **07/10/2026 12:04** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
-- Nenhum job rodando.
-- **GPU:** NVIDIA GeForce RTX 5090, 94 %, 5695 MiB, 32607 MiB
+- **Job:** `mbert__linear__multilingual` — treino final + teste
+- **GPU:** NVIDIA GeForce RTX 5090, 0 %, 5695 MiB, 32607 MiB
 
 ## Jobs
 
@@ -38,7 +38,6 @@ Atualizado em **07/10/2026 12:03** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-05 06:15:26] start search beto__biaffine__es
 [2026-10-05 19:38:14] done search beto__biaffine__es
 [2026-10-05 19:38:14] start final_train beto__biaffine__es
 [2026-10-05 21:19:22] done final_train beto__biaffine__es
@@ -48,4 +47,5 @@ Atualizado em **07/10/2026 12:03** (atualização a cada hora e ao fim de cada e
 [2026-10-07 06:10:26] start search mbert__linear__multilingual
 [2026-10-07 09:41:39] start search mbert__linear__multilingual
 [2026-10-07 12:03:59] done search mbert__linear__multilingual
+[2026-10-07 12:04:03] start final_train mbert__linear__multilingual
 ```
