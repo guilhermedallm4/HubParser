@@ -1,7 +1,7 @@
 # Progresso dos experimentos multilíngues
 
-Atualizado em **07/10/2026 18:17** (horário de Brasília) pela máquina BERT, de hora em hora.
-Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **07/10 17:34**.
+Atualizado em **07/10/2026 19:17** (horário de Brasília) pela máquina BERT, de hora em hora.
+Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **07/10 18:23**.
 
 ## Fila
 
@@ -14,8 +14,8 @@ Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada 
 | `bert__biaffine_fix__en` | máquina BERT | ✅ pronto | 18 | — | 92.61 | en 92.34 |
 | `bert__biaffine__en` | máquina BERT | ✅ pronto | 19 | — | 79.67 | en 80.23 |
 | `mbert__linear__multilingual` | máquina BETO | ✅ pronto | 35 | — | 89.23 | pt 93.48 · en 86.98 · es 88.57 |
-| `mbert__biaffine_fix__multilingual` | máquina BERT | 🔄 busca 25/50 folds | 56 | ~23 h | 92.16 | — |
-| `mbert__biaffine__multilingual` | máquina BETO | 🔄 busca 3/50 folds | 38 | ~30 h | — | — |
+| `mbert__biaffine_fix__multilingual` | máquina BERT | 🔄 busca 27/50 folds | 56 | ~21 h | 92.16 | — |
+| `mbert__biaffine__multilingual` | máquina BETO | 🔄 busca 4/50 folds | 39 | ~30 h | — | — |
 | `bertimbau-base__biaffine_fix__pt` | livre | ⏳ pendente | — | — | — | — |
 | `mbert__biaffine_fix__pt` | livre | ⏳ pendente | — | — | — | — |
 | `jabuticabert__biaffine_fix__pt` | livre | ⏳ pendente | — | — | — | — |
