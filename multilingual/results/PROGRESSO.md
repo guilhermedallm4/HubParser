@@ -1,7 +1,7 @@
 # Progresso dos experimentos multilíngues
 
-Atualizado em **07/10/2026 15:17** (horário de Brasília) pela máquina BERT, de hora em hora.
-Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **07/10 15:04**.
+Atualizado em **07/10/2026 16:17** (horário de Brasília) pela máquina BERT, de hora em hora.
+Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **07/10 15:34**.
 
 ## Fila
 
@@ -13,9 +13,9 @@ Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada 
 | `bert__linear__en` | máquina BERT | ✅ pronto | 18 | — | 84.05 | en 84.79 |
 | `bert__biaffine_fix__en` | máquina BERT | ✅ pronto | 18 | — | 92.61 | en 92.34 |
 | `bert__biaffine__en` | máquina BERT | ✅ pronto | 19 | — | 79.67 | en 80.23 |
-| `mbert__linear__multilingual` | máquina BETO | 🔄 treino final | 35 | — | 89.23 | — |
+| `mbert__linear__multilingual` | máquina BETO | ✅ pronto | 35 | — | 89.23 | pt 93.48 · en 86.98 · es 88.57 |
 | `mbert__biaffine_fix__multilingual` | máquina BERT | 🔄 busca 23/50 folds | 55 | ~25 h | 92.16 | — |
-| `mbert__biaffine__multilingual` | livre | ⏳ pendente | — | — | — | — |
+| `mbert__biaffine__multilingual` | máquina BETO | ⏳ pendente | — | — | — | — |
 | `bertimbau-base__biaffine_fix__pt` | livre | ⏳ pendente | — | — | — | — |
 | `mbert__biaffine_fix__pt` | livre | ⏳ pendente | — | — | — | — |
 | `jabuticabert__biaffine_fix__pt` | livre | ⏳ pendente | — | — | — | — |
@@ -34,3 +34,6 @@ UAS / LAS por decodificação. A seleção da configuração usa só a validaç�
 | bert | linear | en | en | 97.16 | 86.64 / 84.79 | 88.68 / 86.66 | 87.48 / 85.55 | 84.05 ± 0.52 |
 | bert | biaffine_fix | en | en | 97.40 | 94.16 / 92.34 | 94.17 / 92.31 | 94.21 / 92.37 | 92.61 ± 0.37 |
 | bert | biaffine | en | en | 97.21 | 81.89 / 80.23 | 85.67 / 83.83 | 83.24 / 81.50 | 79.67 ± 0.54 |
+| mbert | linear | multilingual | pt | 98.78 | 95.17 / 93.48 | 95.35 / 93.62 | 95.24 / 93.53 | 89.23 ± 0.13 |
+| mbert | linear | multilingual | en | 96.57 | 89.27 / 86.98 | 89.98 / 87.59 | 89.68 / 87.32 | 89.23 ± 0.13 |
+| mbert | linear | multilingual | es | 98.89 | 91.02 / 88.57 | 91.73 / 89.22 | 91.34 / 88.86 | 89.23 ± 0.13 |
