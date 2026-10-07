@@ -69,7 +69,8 @@ línguas. O BERT-base-cased é treinado no inglês (UD_English-EWT) e o BETO no 
 (UD_Spanish-AnCora), e o mBERT treina num corpus conjunto (Porttinari + EWT + AnCora).
 Todos usam os cabeçotes linear, biaffine e biaffine corrigido (alvo de head no primeiro
 subtoken da palavra) e são avaliados com decodificação gulosa, Eisner e MST. O
-protocolo de busca é o mesmo da dissertação. Instruções de execução: [`multilingual/INSTRUCOES_CLAUDE.md`](multilingual/INSTRUCOES_CLAUDE.md).
+protocolo de busca é o mesmo da dissertação. Acompanhamento em tempo real:
+[`multilingual/PROGRESSO.md`](multilingual/PROGRESSO.md). Instruções de execução: [`multilingual/INSTRUCOES_CLAUDE.md`](multilingual/INSTRUCOES_CLAUDE.md).
 
 ## Estrutura
 

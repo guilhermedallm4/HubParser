@@ -39,6 +39,16 @@ O usuário vai dizer qual é o papel da máquina: **máquina BETO** (`maquina_be
    reserva, inclusive quando ela é reiniciada. Para liberar a reserva de uma máquina que
    deixou de existir, apague o `CLAIM` desse job e faça push; só faça isso com
    autorização do usuário.
+8. **Página de progresso e retomada automática.** O `run_queue.py` agora:
+   - publica `progresso/<MAQ>.md` de hora em hora e ao fim de cada etapa, com o job e o
+     fold atuais, a GPU, a tabela de jobs, os resultados de teste e os eventos (índice em
+     `PROGRESSO.md`); cada máquina escreve só o próprio arquivo;
+   - reinicia sozinho uma etapa que travar (log parado por 45 min) ou que terminar com
+     erro (por exemplo, `CUDA error: the launch timed out`), retomando do último fold salvo,
+     até 3 vezes.
+
+   Isso só passa a valer depois de reiniciar a fila com o código novo (passo 6), de
+   preferência logo depois de um fold terminar.
 
 Se você começou a rodar com uma versão antiga:
 1. Pare a fila (`kill` no PID de `logs/queue_<MAQ>.pid` e nos processos `hubparser_ml` filhos).

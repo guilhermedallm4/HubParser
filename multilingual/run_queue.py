@@ -1,7 +1,8 @@
 """Runs one machine's job queue (jobs.json): for each job, the Optuna search and then
 the final training. Finished steps are skipped, so the script can simply be started
-again after any interruption. Results (folds.jsonl, best.json, final.json) are
-committed and pushed to git every few hours and at the end of each step.
+again after any interruption. Results (folds.jsonl, best.json, final.json) and the
+progress page progresso/<machine>.md are committed and pushed to git every hour and at
+the end of each step.
 
 Usage:
   python run_queue.py --machine maquina_beto          # run (use nohup, see INSTRUCOES_CLAUDE.md)
@@ -30,7 +31,7 @@ def reload_jobs(push):
     if push:
         subprocess.run(["git", "pull", "-q", "--rebase", "--autostash"], cwd=REPO, check=False)
     JOBS = json.loads((ROOT / "jobs.json").read_text())
-SYNC_EVERY_S = 6 * 3600
+SYNC_EVERY_S = 3600   # results + progress page are pushed every hour
 STALL_S = 45 * 60      # a step whose log does not grow for this long is considered hung
 MAX_RESTARTS = 3       # restarts after a hang or an error exit, per step
 RETRY_WAIT_S = 5 * 60
@@ -70,8 +71,10 @@ def log(msg):
     print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}] {msg}", flush=True)
 
 
-def git_sync(message, push=True):
-    paths = ["multilingual/results"]
+def git_sync(message, push=True, machine=None, current=None):
+    if machine:
+        write_progress(machine, current)
+    paths = ["multilingual/results", "multilingual/progresso"]
     subprocess.run(["git", "add", *paths], cwd=REPO, check=False)
     if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=REPO).returncode == 0:
         return
@@ -153,6 +156,7 @@ def run_step(module, j, push, machine):
     cmd = [sys.executable, "-m", f"hubparser_ml.{module}", "--encoder", j["encoder"], "--head", j["head"], "--corpus", j["corpus"]]
     for attempt in range(1, MAX_RESTARTS + 2):
         log(f"start {module} {name}" + (f" (attempt {attempt})" if attempt > 1 else ""))
+        git_sync(f"multilingual: progresso {name} ({machine})", push, machine, (module, j))
         logfile = open(logpath, "a")
         p = subprocess.Popen(cmd, cwd=ROOT, stdout=logfile, stderr=subprocess.STDOUT, start_new_session=True)
         last_sync = last_growth = time.time()
@@ -173,7 +177,7 @@ def run_step(module, j, push, machine):
                 p.wait()
                 break
             if time.time() - last_sync > SYNC_EVERY_S:
-                git_sync(f"multilingual: progresso {name} ({machine})", push)
+                git_sync(f"multilingual: progresso {name} ({machine})", push, machine, (module, j))
                 last_sync = time.time()
         logfile.close()
         shutil.rmtree(ROOT / "results" / name / "tmp_run", ignore_errors=True)
@@ -184,53 +188,118 @@ def run_step(module, j, push, machine):
             # transient GPU/driver errors (e.g. "CUDA error: the launch timed out") end the
             # process with an error; wait, check the GPU and run the step again
             log(f"FAILED {module} {name} (exit {p.returncode}); see logs/{name}__{module}.log")
-            git_sync(f"multilingual: progresso {name} ({machine})", push)
+            git_sync(f"multilingual: progresso {name} ({machine})", push, machine)
             if attempt <= MAX_RESTARTS:
                 time.sleep(RETRY_WAIT_S)
                 log(f"GPU check before retrying: {'ok' if gpu_ok() else 'FAILED'}")
                 continue
             sys.exit(p.returncode)
-        git_sync(f"multilingual: {name} {'busca concluída' if module == 'search' else 'treino final concluído'} ({machine})", push)
         log(f"done {module} {name}")
+        git_sync(f"multilingual: {name} {'busca concluída' if module == 'search' else 'treino final concluído'} ({machine})", push, machine)
         return
     log(f"FAILED {module} {name}: failed or stalled {MAX_RESTARTS + 1} times in a row")
-    git_sync(f"multilingual: progresso {name} ({machine})", push)
+    git_sync(f"multilingual: progresso {name} ({machine})", push, machine)
     sys.exit(1)
+
+
+def job_row(j, m):
+    """(job, state, owner, details) for one job, as shown by --status and the progress page."""
+    d = ROOT / "results" / job_name(j)
+    raw = [json.loads(l) for l in (d / "folds.jsonl").read_text().splitlines()] if (d / "folds.jsonl").exists() else []
+    uniq = {}
+    for f in raw:
+        ci = config_index(f["hyperparameters"])
+        if ci is not None:
+            uniq.setdefault((ci, f["fold"]), dict(f, trial=ci))
+    folds = list(uniq.values())
+    if search_complete(j) and final_up_to_date(j):
+        state = "final pronto"
+    elif search_complete(j):
+        state = "busca pronta"
+    else:
+        state = f"busca {len(folds)}/50 folds" if folds else "pendente"
+    extra = ""
+    if folds:
+        mins = [f["minutes"] for f in folds]
+        by_trial = {}
+        for f in folds:
+            by_trial.setdefault(f["trial"], []).append(f["las"])
+        full = {t: sum(v) / len(v) for t, v in by_trial.items() if len(v) == 5}
+        best = f"melhor LAS médio de validação {100 * max(full.values()):.2f}" if full else ""
+        eta = (50 - len(folds)) * (sum(mins) / len(mins)) / 60
+        extra = f"{sum(mins) / len(mins):.0f} min/fold, ~{eta:.0f} h restantes na busca" + (f"; {best}" if best else "")
+    if state == "final pronto":
+        fin = json.loads((d / "final.json").read_text())["test"]
+        extra = " ".join(f"{l}: LAS {v['las']:.2f}" for l, v in fin["greedy"].items()) + " (gulosa)"
+    owner = (claim_owner(j) or "livre") if m == POOL else ""
+    return job_name(j), state, owner, extra
 
 
 def status(machines):
     for m in machines:
         print(f"\n== {m}")
         for j in JOBS[m]:
-            d = ROOT / "results" / job_name(j)
-            raw = [json.loads(l) for l in (d / "folds.jsonl").read_text().splitlines()] if (d / "folds.jsonl").exists() else []
-            uniq = {}
-            for f in raw:
-                ci = config_index(f["hyperparameters"])
-                if ci is not None:
-                    uniq.setdefault((ci, f["fold"]), dict(f, trial=ci))
-            folds = list(uniq.values())
-            if search_complete(j) and final_up_to_date(j):
-                state = "final pronto"
-            elif search_complete(j):
-                state = "busca pronta"
-            else:
-                state = f"busca {len(folds)}/50 folds" if folds else "pendente"
-            mins = [f["minutes"] for f in folds]
-            extra = ""
-            if folds:
-                by_trial = {}
-                for f in folds:
-                    by_trial.setdefault(f["trial"], []).append(f["las"])
-                full = {t: sum(v) / len(v) for t, v in by_trial.items() if len(v) == 5}
-                best = f" melhor LAS médio {max(full.values()):.4f}" if full else ""
-                eta = (50 - len(folds)) * (sum(mins) / len(mins)) / 60
-                extra = f" | {sum(mins) / len(mins):.0f} min/fold, ~{eta:.0f} h restantes na busca{best}"
-            if state == "final pronto":
-                fin = json.loads((d / "final.json").read_text())["test"]
-                extra = " | " + " ".join(f"{l}: LAS {v['las']:.2f}" for l, v in fin["greedy"].items()) + " (gulosa)"
-            owner = f" [{claim_owner(j)}]" if m == POOL and claim_owner(j) else (" [livre]" if m == POOL else "")
-            print(f"  {job_name(j):42s} {state}{owner}{extra}")
+            name, state, owner, extra = job_row(j, m)
+            print(f"  {name:42s} {state}" + (f" [{owner}]" if owner else "") + (f" | {extra}" if extra else ""))
+
+
+def _tail(path, nbytes=30000):
+    try:
+        with open(path, "rb") as f:
+            f.seek(max(0, path.stat().st_size - nbytes))
+            return f.read().decode("utf-8", "replace").replace("\r", "\n")
+    except FileNotFoundError:
+        return ""
+
+
+def write_progress(machine, current=None):
+    """Write progresso/<machine>.md: live state of this machine + every job + test results.
+    Each machine writes only its own file, so the two never conflict in git."""
+    import re
+    out = [f"# Progresso — `{machine}`", "",
+           f"Atualizado em **{datetime.now():%d/%m/%Y %H:%M}** (atualização a cada hora e ao fim de cada etapa).", ""]
+    gpu = subprocess.run(["nvidia-smi", "--query-gpu=name,utilization.gpu,memory.used,memory.total",
+                          "--format=csv,noheader"], capture_output=True, text=True).stdout.strip()
+    out += ["## Agora", ""]
+    if current:
+        module, j = current
+        name = job_name(j)
+        tail = _tail(ROOT / "logs" / f"{name}__{module}.log")
+        cf = re.findall(r"\] config (\d+) fold (\d+) \{", _tail(ROOT / "logs" / f"{name}__{module}.log", 8_000_000))
+        bars = re.findall(r"(\d+)/(\d+) \[([0-9:]+)<([0-9:?]+), *([0-9.]+)it/s\]", tail)
+        etapa = "busca (validação cruzada)" if module == "search" else "treino final + teste"
+        out.append(f"- **Job:** `{name}` — {etapa}")
+        if cf:
+            out.append(f"- **Configuração / fold:** config {cf[-1][0]}, fold {cf[-1][1]}")
+        if bars:
+            a, b, el, rem, rate = bars[-1]
+            out.append(f"- **Fold atual:** {100 * int(a) / int(b):.0f}% ({a}/{b} passos), ~{rem} restantes, {rate} it/s")
+    else:
+        out.append("- Nenhum job rodando.")
+    out += [f"- **GPU:** {gpu or 'indisponível'}", ""]
+
+    out += ["## Jobs", "", "| Fila | Job | Estado | Reserva | Detalhes |", "|---|---|---|---|---|"]
+    for m in [k for k in JOBS if not k.startswith("_")]:
+        for j in JOBS[m]:
+            name, state, owner, extra = job_row(j, m)
+            out.append(f"| {m} | `{name}` | {state} | {owner} | {extra} |")
+    out.append("")
+
+    out += ["## Resultados de teste (modelo da época 40)", "",
+            "| Job | Língua | Gulosa UAS / LAS | Eisner UAS / LAS | MST UAS / LAS | UPOS |", "|---|---|---|---|---|---|"]
+    for f in sorted((ROOT / "results").glob("*/final.json")):
+        r = json.loads(f.read_text())
+        t = r["test"]
+        for lang in t["greedy"]:
+            cell = lambda dec: f"{t[dec][lang]['uas']:.2f} / {t[dec][lang]['las']:.2f}"
+            out.append(f"| `{r['job']}` | {lang} | {cell('greedy')} | {cell('eisner')} | {cell('mst')} | {t['greedy'][lang]['upos']:.2f} |")
+    out.append("")
+
+    events = [l for l in _tail(ROOT / "logs" / f"queue_{machine}.log", 20000).splitlines()
+              if l.startswith("[") and "git push ok" not in l][-10:]
+    out += ["## Eventos recentes", "", "```", *events, "```", ""]
+    (ROOT / "progresso").mkdir(exist_ok=True)
+    (ROOT / "progresso" / f"{machine}.md").write_text("\n".join(out))
 
 
 def main():
@@ -260,6 +329,7 @@ def main():
         if not final_up_to_date(j):
             run_step("final_train", j, not args.no_push, args.machine)
     log("queue finished")
+    git_sync(f"multilingual: fila {args.machine} concluída", not args.no_push, args.machine)
     status([args.machine, POOL] if POOL in JOBS else [args.machine])
 
 
