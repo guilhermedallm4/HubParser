@@ -32,7 +32,8 @@ def reload_jobs(push):
     JOBS = json.loads((ROOT / "jobs.json").read_text())
 SYNC_EVERY_S = 6 * 3600
 STALL_S = 45 * 60      # a step whose log does not grow for this long is considered hung
-MAX_RESTARTS = 3
+MAX_RESTARTS = 3       # restarts after a hang or an error exit, per step
+RETRY_WAIT_S = 5 * 60
 POOL = "compartilhado"  # jobs taken by whichever machine finishes its own queue first
 CONFIGS = json.loads((ROOT / "data" / "search_configs.json").read_text())["configs"]
 
@@ -135,10 +136,17 @@ def next_pool_job(machine, push):
     return None
 
 
+def gpu_ok():
+    r = subprocess.run([sys.executable, "-c", "import torch; x = torch.ones(1024, 1024, device='cuda'); "
+                        "torch.cuda.synchronize(); print(float((x @ x).sum()))"], capture_output=True, text=True)
+    return r.returncode == 0
+
+
 def run_step(module, j, push, machine):
     """Run one step as a subprocess. If its log stops growing for STALL_S (a hang, e.g. a
-    DataLoader deadlock), kill the whole process group and run the step again; the
-    search resumes from the last finished fold."""
+    DataLoader deadlock), kill the whole process group and run the step again; if it exits
+    with an error (e.g. a transient CUDA error), wait RETRY_WAIT_S and run it again. The
+    search resumes from the last finished fold. Gives up after MAX_RESTARTS restarts."""
     name = job_name(j)
     (ROOT / "logs").mkdir(exist_ok=True)
     logpath = ROOT / "logs" / f"{name}__{module}.log"
@@ -173,13 +181,19 @@ def run_step(module, j, push, machine):
         if stalled:
             continue
         if p.returncode != 0:
+            # transient GPU/driver errors (e.g. "CUDA error: the launch timed out") end the
+            # process with an error; wait, check the GPU and run the step again
             log(f"FAILED {module} {name} (exit {p.returncode}); see logs/{name}__{module}.log")
             git_sync(f"multilingual: progresso {name} ({machine})", push)
+            if attempt <= MAX_RESTARTS:
+                time.sleep(RETRY_WAIT_S)
+                log(f"GPU check before retrying: {'ok' if gpu_ok() else 'FAILED'}")
+                continue
             sys.exit(p.returncode)
         git_sync(f"multilingual: {name} {'busca concluída' if module == 'search' else 'treino final concluído'} ({machine})", push)
         log(f"done {module} {name}")
         return
-    log(f"FAILED {module} {name}: stalled {MAX_RESTARTS + 1} times in a row")
+    log(f"FAILED {module} {name}: failed or stalled {MAX_RESTARTS + 1} times in a row")
     git_sync(f"multilingual: progresso {name} ({machine})", push)
     sys.exit(1)
 
