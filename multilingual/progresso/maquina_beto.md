@@ -1,11 +1,11 @@
 # Progresso — `maquina_beto`
 
-Atualizado em **07/10/2026 13:04** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **07/10/2026 14:04** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
 - **Job:** `mbert__linear__multilingual` — treino final + teste
-- **Fold atual:** 29% (47300/163640 passos), ~2:19:01 restantes, 13.95 it/s
+- **Fold atual:** 58% (94668/163640 passos), ~1:23:51 restantes, 13.71 it/s
 - **GPU:** NVIDIA GeForce RTX 5090, 92 %, 6153 MiB, 32607 MiB
 
 ## Jobs
@@ -19,7 +19,7 @@ Atualizado em **07/10/2026 13:04** (atualização a cada hora e ao fim de cada e
 | maquina_bert | `bert__biaffine_fix__en` | final pronto |  | en: LAS 92.34 (gulosa) |
 | maquina_bert | `bert__biaffine__en` | final pronto |  | en: LAS 80.23 (gulosa) |
 | compartilhado | `mbert__linear__multilingual` | busca pronta | maquina_beto | 35 min/fold, ~0 h restantes na busca; melhor LAS médio de validação 89.23 |
-| compartilhado | `mbert__biaffine_fix__multilingual` | busca 18/50 folds | maquina_bert | 57 min/fold, ~30 h restantes na busca; melhor LAS médio de validação 92.16 |
+| compartilhado | `mbert__biaffine_fix__multilingual` | busca 19/50 folds | maquina_bert | 56 min/fold, ~29 h restantes na busca; melhor LAS médio de validação 92.16 |
 | compartilhado | `mbert__biaffine__multilingual` | pendente | livre |  |
 | compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
