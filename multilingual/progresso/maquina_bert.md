@@ -1,13 +1,13 @@
 # Progresso — `maquina_bert`
 
-Atualizado em **08/10/2026 09:12** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **08/10/2026 13:28** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
 - **Job:** `mbert__biaffine_fix__multilingual` — busca (validação cruzada)
-- **Configuração / fold:** config 7, fold 2
-- **Fold atual:** 78% (58113/74480 passos), ~12:57 restantes, 21.05 it/s
-- **GPU:** NVIDIA GeForce RTX 4090, 93 %, 5366 MiB, 24564 MiB
+- **Configuração / fold:** config 7, fold 3
+- **Fold atual:** 0% (355/74480 passos), ~57:30 restantes, 21.49 it/s
+- **GPU:** NVIDIA GeForce RTX 4090, 0 %, 52 MiB, 24564 MiB
 
 ## Jobs
 
@@ -20,8 +20,8 @@ Atualizado em **08/10/2026 09:12** (atualização a cada hora e ao fim de cada e
 | maquina_bert | `bert__biaffine_fix__en` | final pronto |  | en: LAS 92.34 (gulosa) |
 | maquina_bert | `bert__biaffine__en` | final pronto |  | en: LAS 80.23 (gulosa) |
 | compartilhado | `mbert__linear__multilingual` | final pronto | maquina_beto | pt: LAS 93.48 en: LAS 86.98 es: LAS 88.57 (gulosa) |
-| compartilhado | `mbert__biaffine_fix__multilingual` | busca 37/50 folds | maquina_bert | 58 min/fold, ~13 h restantes na busca; melhor LAS médio de validação 92.23 |
-| compartilhado | `mbert__biaffine__multilingual` | busca 26/50 folds | maquina_beto | 38 min/fold, ~15 h restantes na busca; melhor LAS médio de validação 88.48 |
+| compartilhado | `mbert__biaffine_fix__multilingual` | busca 38/50 folds | maquina_bert | 58 min/fold, ~12 h restantes na busca; melhor LAS médio de validação 92.23 |
+| compartilhado | `mbert__biaffine__multilingual` | busca 34/50 folds | maquina_beto | 38 min/fold, ~10 h restantes na busca; melhor LAS médio de validação 88.48 |
 | compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `jabuticabert__biaffine_fix__pt` | pendente | livre |  |
@@ -43,7 +43,6 @@ Atualizado em **08/10/2026 09:12** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-05 14:22:44] start final_train bert__biaffine_fix__en
 [2026-10-05 16:11:52] done final_train bert__biaffine_fix__en
 [2026-10-05 16:11:53] start search bert__biaffine__en
 [2026-10-06 08:54:00] start search bert__biaffine__en
@@ -53,4 +52,5 @@ Atualizado em **08/10/2026 09:12** (atualização a cada hora e ao fim de cada e
 [2026-10-06 18:03:38] claimed mbert__biaffine_fix__multilingual from the shared pool
 [2026-10-06 18:03:38] start search mbert__biaffine_fix__multilingual
 [2026-10-08 03:12:06] start search mbert__biaffine_fix__multilingual
+[2026-10-08 13:28:41] start search mbert__biaffine_fix__multilingual
 ```
