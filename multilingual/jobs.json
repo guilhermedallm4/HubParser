@@ -1,5 +1,5 @@
 {
-  "_comment": "Filas executadas por run_queue.py, que relê este arquivo (com git pull) antes de cada job. Cada máquina roda primeiro a própria fila; quando ela acaba, pega o próximo job livre de 'compartilhado' (mBERT primeiro), reservando-o com results/<job>/CLAIM no git. Cada job = 10 configurações x 5 folds + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix; o biaffine original roda só no BETO-es, no BERT-en e no mBERT no corpus conjunto, como comparação.",
+  "_comment": "Filas executadas por run_queue.py, que relê este arquivo (com git pull) antes de cada job. Cada máquina roda primeiro a própria fila; quando ela acaba, pega o próximo job livre de 'compartilhado' (mBERT primeiro), reservando-o com results/<job>/CLAIM no git. Cada job = 10 configurações x 5 folds + treino final. corpus: en = UD_English-EWT, es = UD_Spanish-AnCora, pt = Porttinari, multilingual = pt+en+es juntos. Cabeçotes: linear e biaffine_fix; o biaffine original roda só no BETO-es, no BERT-en e no mBERT no corpus conjunto, como comparação. Chaves que começam com '_' são ignoradas pela fila: '_adiado' guarda os biaffine_fix no PT, adiados para dar prioridade ao estudo de dinâmica de treino.",
   "maquina_beto": [
     {
       "encoder": "beto",
@@ -49,7 +49,9 @@
       "encoder": "mbert",
       "head": "biaffine",
       "corpus": "multilingual"
-    },
+    }
+  ],
+  "_adiado": [
     {
       "encoder": "bertimbau-base",
       "head": "biaffine_fix",
