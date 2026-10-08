@@ -1,13 +1,13 @@
 # Progresso — `maquina_bert`
 
-Atualizado em **08/10/2026 03:12** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **08/10/2026 04:12** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
 - **Job:** `mbert__biaffine_fix__multilingual` — busca (validação cruzada)
 - **Configuração / fold:** config 6, fold 2
-- **Fold atual:** 0% (131/74480 passos), ~1:00:31 restantes, 20.47 it/s
-- **GPU:** NVIDIA GeForce RTX 4090, 0 %, 52 MiB, 24564 MiB
+- **Fold atual:** 97% (71964/74480 passos), ~02:00 restantes, 20.88 it/s
+- **GPU:** NVIDIA GeForce RTX 4090, 93 %, 5386 MiB, 24564 MiB
 
 ## Jobs
 
