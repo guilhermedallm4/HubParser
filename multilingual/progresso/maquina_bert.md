@@ -1,13 +1,13 @@
 # Progresso — `maquina_bert`
 
-Atualizado em **08/10/2026 21:29** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **08/10/2026 22:29** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
 - **Job:** `mbert__biaffine_fix__multilingual` — busca (validação cruzada)
 - **Configuração / fold:** config 9, fold 1
-- **Fold atual:** 3% (2149/74480 passos), ~1:00:26 restantes, 19.94 it/s
-- **GPU:** NVIDIA GeForce RTX 4090, 88 %, 5554 MiB, 24564 MiB
+- **Fold atual:** 99% (73941/74480 passos), ~00:25 restantes, 21.12 it/s
+- **GPU:** NVIDIA GeForce RTX 4090, 92 %, 5566 MiB, 24564 MiB
 
 ## Jobs
 
@@ -21,7 +21,7 @@ Atualizado em **08/10/2026 21:29** (atualização a cada hora e ao fim de cada e
 | maquina_bert | `bert__biaffine__en` | final pronto |  | en: LAS 80.23 (gulosa) |
 | compartilhado | `mbert__linear__multilingual` | final pronto | maquina_beto | pt: LAS 93.48 en: LAS 86.98 es: LAS 88.57 (gulosa) |
 | compartilhado | `mbert__biaffine_fix__multilingual` | busca 46/50 folds | maquina_bert | 58 min/fold, ~4 h restantes na busca; melhor LAS médio de validação 92.23 |
-| compartilhado | `mbert__biaffine__multilingual` | busca 44/50 folds | maquina_beto | 38 min/fold, ~4 h restantes na busca; melhor LAS médio de validação 88.48 |
+| compartilhado | `mbert__biaffine__multilingual` | busca 46/50 folds | maquina_beto | 38 min/fold, ~3 h restantes na busca; melhor LAS médio de validação 88.48 |
 | compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `jabuticabert__biaffine_fix__pt` | pendente | livre |  |
