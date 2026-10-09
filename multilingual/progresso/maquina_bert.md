@@ -1,12 +1,12 @@
 # Progresso — `maquina_bert`
 
-Atualizado em **09/10/2026 05:15** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **09/10/2026 06:15** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
 - **Job:** `mbert__biaffine_fix__multilingual` — treino final + teste
-- **Fold atual:** 81% (132105/163640 passos), ~54:55 restantes, 9.57 it/s
-- **GPU:** NVIDIA GeForce RTX 4090, 95 %, 10368 MiB, 24564 MiB
+- **Fold atual:** 100% (217/217 passos), ~00:00 restantes, 10715.25 it/s
+- **GPU:** NVIDIA GeForce RTX 4090, 21 %, 10368 MiB, 24564 MiB
 
 ## Jobs
 
