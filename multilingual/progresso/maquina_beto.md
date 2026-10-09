@@ -4,7 +4,7 @@ Atualizado em **08/10/2026 23:38** (atualização a cada hora e ao fim de cada e
 
 ## Agora
 
-- Nenhum job rodando.
+- **Job:** `mbert__biaffine__multilingual` — treino final + teste
 - **GPU:** NVIDIA GeForce RTX 5090, 0 %, 225 MiB, 32607 MiB
 
 ## Jobs
@@ -41,7 +41,6 @@ Atualizado em **08/10/2026 23:38** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-07 09:41:39] start search mbert__linear__multilingual
 [2026-10-07 12:03:59] done search mbert__linear__multilingual
 [2026-10-07 12:04:03] start final_train mbert__linear__multilingual
 [2026-10-07 15:34:29] done final_train mbert__linear__multilingual
@@ -51,4 +50,5 @@ Atualizado em **08/10/2026 23:38** (atualização a cada hora e ao fim de cada e
 [2026-10-07 18:23:05] GPU check before retrying: ok
 [2026-10-07 18:23:05] start search mbert__biaffine__multilingual (attempt 2)
 [2026-10-08 23:38:34] done search mbert__biaffine__multilingual
+[2026-10-08 23:38:38] start final_train mbert__biaffine__multilingual
 ```
