@@ -1,13 +1,11 @@
 # Progresso — `maquina_beto`
 
-Atualizado em **08/10/2026 23:26** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **08/10/2026 23:38** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
-- **Job:** `mbert__biaffine__multilingual` — busca (validação cruzada)
-- **Configuração / fold:** config 9, fold 4
-- **Fold atual:** 69% (51203/74480 passos), ~10:12 restantes, 38.01 it/s
-- **GPU:** NVIDIA GeForce RTX 5090, 90 %, 5441 MiB, 32607 MiB
+- Nenhum job rodando.
+- **GPU:** NVIDIA GeForce RTX 5090, 0 %, 225 MiB, 32607 MiB
 
 ## Jobs
 
@@ -20,8 +18,8 @@ Atualizado em **08/10/2026 23:26** (atualização a cada hora e ao fim de cada e
 | maquina_bert | `bert__biaffine_fix__en` | final pronto |  | en: LAS 92.34 (gulosa) |
 | maquina_bert | `bert__biaffine__en` | final pronto |  | en: LAS 80.23 (gulosa) |
 | compartilhado | `mbert__linear__multilingual` | final pronto | maquina_beto | pt: LAS 93.48 en: LAS 86.98 es: LAS 88.57 (gulosa) |
-| compartilhado | `mbert__biaffine_fix__multilingual` | busca 46/50 folds | maquina_bert | 58 min/fold, ~4 h restantes na busca; melhor LAS médio de validação 92.23 |
-| compartilhado | `mbert__biaffine__multilingual` | busca 49/50 folds | maquina_beto | 38 min/fold, ~1 h restantes na busca; melhor LAS médio de validação 88.48 |
+| compartilhado | `mbert__biaffine_fix__multilingual` | busca 48/50 folds | maquina_bert | 58 min/fold, ~2 h restantes na busca; melhor LAS médio de validação 92.23 |
+| compartilhado | `mbert__biaffine__multilingual` | busca pronta | maquina_beto | 38 min/fold, ~0 h restantes na busca; melhor LAS médio de validação 88.48 |
 | compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `jabuticabert__biaffine_fix__pt` | pendente | livre |  |
@@ -43,7 +41,6 @@ Atualizado em **08/10/2026 23:26** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-07 06:10:26] start search mbert__linear__multilingual
 [2026-10-07 09:41:39] start search mbert__linear__multilingual
 [2026-10-07 12:03:59] done search mbert__linear__multilingual
 [2026-10-07 12:04:03] start final_train mbert__linear__multilingual
@@ -53,4 +50,5 @@ Atualizado em **08/10/2026 23:26** (atualização a cada hora e ao fim de cada e
 [2026-10-07 18:17:58] FAILED search mbert__biaffine__multilingual (exit 1); see logs/mbert__biaffine__multilingual__search.log
 [2026-10-07 18:23:05] GPU check before retrying: ok
 [2026-10-07 18:23:05] start search mbert__biaffine__multilingual (attempt 2)
+[2026-10-08 23:38:34] done search mbert__biaffine__multilingual
 ```
