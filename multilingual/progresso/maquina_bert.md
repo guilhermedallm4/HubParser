@@ -4,7 +4,7 @@ Atualizado em **09/10/2026 01:14** (atualização a cada hora e ao fim de cada e
 
 ## Agora
 
-- Nenhum job rodando.
+- **Job:** `mbert__biaffine_fix__multilingual` — treino final + teste
 - **GPU:** NVIDIA GeForce RTX 4090, 0 %, 52 MiB, 24564 MiB
 
 ## Jobs
@@ -41,7 +41,6 @@ Atualizado em **09/10/2026 01:14** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-05 16:11:53] start search bert__biaffine__en
 [2026-10-06 08:54:00] start search bert__biaffine__en
 [2026-10-06 16:14:28] done search bert__biaffine__en
 [2026-10-06 16:14:28] start final_train bert__biaffine__en
@@ -51,4 +50,5 @@ Atualizado em **09/10/2026 01:14** (atualização a cada hora e ao fim de cada e
 [2026-10-08 03:12:06] start search mbert__biaffine_fix__multilingual
 [2026-10-08 13:28:41] start search mbert__biaffine_fix__multilingual
 [2026-10-09 01:14:46] done search mbert__biaffine_fix__multilingual
+[2026-10-09 01:14:48] start final_train mbert__biaffine_fix__multilingual
 ```
