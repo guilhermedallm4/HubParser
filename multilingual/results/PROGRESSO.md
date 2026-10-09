@@ -1,7 +1,7 @@
 # Progresso dos experimentos multilíngues
 
-Atualizado em **09/10/2026 03:18** (horário de Brasília) pela máquina BERT, de hora em hora.
-Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **09/10 02:39**.
+Atualizado em **09/10/2026 04:18** (horário de Brasília) pela máquina BERT, de hora em hora.
+Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **09/10 03:38**.
 
 ## Fila
 
@@ -15,7 +15,7 @@ Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada 
 | `bert__biaffine__en` | máquina BERT | ✅ pronto | 19 | — | 79.67 | en 80.23 |
 | `mbert__linear__multilingual` | máquina BETO | ✅ pronto | 35 | — | 89.23 | pt 93.48 · en 86.98 · es 88.57 |
 | `mbert__biaffine_fix__multilingual` | máquina BERT | 🔄 treino final | 58 | — | 92.23 | — |
-| `mbert__biaffine__multilingual` | máquina BETO | 🔄 treino final | 38 | — | 88.48 | — |
+| `mbert__biaffine__multilingual` | máquina BETO | ✅ pronto | 38 | — | 88.48 | pt 93.59 · en 88.25 · es 87.65 |
 
 Cada job: 10 configurações × 5 folds (validação cruzada em train + dev) e treino final com a melhor configuração; o teste é usado uma única vez, no treino final.
 
@@ -34,3 +34,6 @@ UAS / LAS por decodificação. A seleção da configuração usa só a validaç�
 | mbert | linear | multilingual | pt | 98.78 | 95.17 / 93.48 | 95.35 / 93.62 | 95.24 / 93.53 | 89.23 ± 0.13 |
 | mbert | linear | multilingual | en | 96.57 | 89.27 / 86.98 | 89.98 / 87.59 | 89.68 / 87.32 | 89.23 ± 0.13 |
 | mbert | linear | multilingual | es | 98.89 | 91.02 / 88.57 | 91.73 / 89.22 | 91.34 / 88.86 | 89.23 ± 0.13 |
+| mbert | biaffine | multilingual | pt | 98.86 | 95.32 / 93.59 | 95.53 / 93.78 | 95.45 / 93.71 | 88.48 ± 0.08 |
+| mbert | biaffine | multilingual | en | 96.87 | 90.28 / 88.25 | 91.02 / 88.95 | 90.61 / 88.54 | 88.48 ± 0.08 |
+| mbert | biaffine | multilingual | es | 98.89 | 90.02 / 87.65 | 91.31 / 88.86 | 90.49 / 88.10 | 88.48 ± 0.08 |
