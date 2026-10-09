@@ -20,9 +20,6 @@ Atualizado em **09/10/2026 06:16** (atualização a cada hora e ao fim de cada e
 | compartilhado | `mbert__linear__multilingual` | final pronto | maquina_beto | pt: LAS 93.48 en: LAS 86.98 es: LAS 88.57 (gulosa) |
 | compartilhado | `mbert__biaffine_fix__multilingual` | final pronto | maquina_bert | pt: LAS 94.98 en: LAS 91.64 es: LAS 92.12 (gulosa) |
 | compartilhado | `mbert__biaffine__multilingual` | final pronto | maquina_beto | pt: LAS 93.59 en: LAS 88.25 es: LAS 87.65 (gulosa) |
-| compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
-| compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
-| compartilhado | `jabuticabert__biaffine_fix__pt` | pendente | livre |  |
 
 ## Resultados de teste (modelo da época 40)
 
@@ -47,7 +44,6 @@ Atualizado em **09/10/2026 06:16** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-06 16:14:28] done search bert__biaffine__en
 [2026-10-06 16:14:28] start final_train bert__biaffine__en
 [2026-10-06 18:03:36] done final_train bert__biaffine__en
 [2026-10-06 18:03:38] claimed mbert__biaffine_fix__multilingual from the shared pool
@@ -57,4 +53,5 @@ Atualizado em **09/10/2026 06:16** (atualização a cada hora e ao fim de cada e
 [2026-10-09 01:14:46] done search mbert__biaffine_fix__multilingual
 [2026-10-09 01:14:48] start final_train mbert__biaffine_fix__multilingual
 [2026-10-09 06:16:17] done final_train mbert__biaffine_fix__multilingual
+[2026-10-09 06:16:19] queue finished
 ```
