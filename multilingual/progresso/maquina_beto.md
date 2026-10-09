@@ -1,11 +1,12 @@
 # Progresso — `maquina_beto`
 
-Atualizado em **08/10/2026 23:38** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **09/10/2026 00:38** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
 - **Job:** `mbert__biaffine__multilingual` — treino final + teste
-- **GPU:** NVIDIA GeForce RTX 5090, 0 %, 225 MiB, 32607 MiB
+- **Fold atual:** 24% (40018/163640 passos), ~2:48:51 restantes, 12.20 it/s
+- **GPU:** NVIDIA GeForce RTX 5090, 91 %, 7451 MiB, 32607 MiB
 
 ## Jobs
 
