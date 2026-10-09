@@ -1,12 +1,11 @@
 # Progresso — `maquina_bert`
 
-Atualizado em **09/10/2026 06:15** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **09/10/2026 06:16** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
-- **Job:** `mbert__biaffine_fix__multilingual` — treino final + teste
-- **Fold atual:** 100% (217/217 passos), ~00:00 restantes, 10715.25 it/s
-- **GPU:** NVIDIA GeForce RTX 4090, 21 %, 10368 MiB, 24564 MiB
+- Nenhum job rodando.
+- **GPU:** NVIDIA GeForce RTX 4090, 0 %, 52 MiB, 24564 MiB
 
 ## Jobs
 
@@ -19,7 +18,7 @@ Atualizado em **09/10/2026 06:15** (atualização a cada hora e ao fim de cada e
 | maquina_bert | `bert__biaffine_fix__en` | final pronto |  | en: LAS 92.34 (gulosa) |
 | maquina_bert | `bert__biaffine__en` | final pronto |  | en: LAS 80.23 (gulosa) |
 | compartilhado | `mbert__linear__multilingual` | final pronto | maquina_beto | pt: LAS 93.48 en: LAS 86.98 es: LAS 88.57 (gulosa) |
-| compartilhado | `mbert__biaffine_fix__multilingual` | busca pronta | maquina_bert | 58 min/fold, ~0 h restantes na busca; melhor LAS médio de validação 92.23 |
+| compartilhado | `mbert__biaffine_fix__multilingual` | final pronto | maquina_bert | pt: LAS 94.98 en: LAS 91.64 es: LAS 92.12 (gulosa) |
 | compartilhado | `mbert__biaffine__multilingual` | final pronto | maquina_beto | pt: LAS 93.59 en: LAS 88.25 es: LAS 87.65 (gulosa) |
 | compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
@@ -38,6 +37,9 @@ Atualizado em **09/10/2026 06:15** (atualização a cada hora e ao fim de cada e
 | `mbert__biaffine__multilingual` | pt | 95.32 / 93.59 | 95.53 / 93.78 | 95.45 / 93.71 | 98.86 |
 | `mbert__biaffine__multilingual` | en | 90.28 / 88.25 | 91.02 / 88.95 | 90.61 / 88.54 | 96.87 |
 | `mbert__biaffine__multilingual` | es | 90.02 / 87.65 | 91.31 / 88.86 | 90.49 / 88.10 | 98.89 |
+| `mbert__biaffine_fix__multilingual` | pt | 96.38 / 94.98 | 96.40 / 94.99 | 96.39 / 94.98 | 99.04 |
+| `mbert__biaffine_fix__multilingual` | en | 93.47 / 91.64 | 93.52 / 91.66 | 93.48 / 91.63 | 96.96 |
+| `mbert__biaffine_fix__multilingual` | es | 94.24 / 92.12 | 94.15 / 92.03 | 94.24 / 92.12 | 99.02 |
 | `mbert__linear__multilingual` | pt | 95.17 / 93.48 | 95.35 / 93.62 | 95.24 / 93.53 | 98.78 |
 | `mbert__linear__multilingual` | en | 89.27 / 86.98 | 89.98 / 87.59 | 89.68 / 87.32 | 96.57 |
 | `mbert__linear__multilingual` | es | 91.02 / 88.57 | 91.73 / 89.22 | 91.34 / 88.86 | 98.89 |
@@ -45,7 +47,6 @@ Atualizado em **09/10/2026 06:15** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-06 08:54:00] start search bert__biaffine__en
 [2026-10-06 16:14:28] done search bert__biaffine__en
 [2026-10-06 16:14:28] start final_train bert__biaffine__en
 [2026-10-06 18:03:36] done final_train bert__biaffine__en
@@ -55,4 +56,5 @@ Atualizado em **09/10/2026 06:15** (atualização a cada hora e ao fim de cada e
 [2026-10-08 13:28:41] start search mbert__biaffine_fix__multilingual
 [2026-10-09 01:14:46] done search mbert__biaffine_fix__multilingual
 [2026-10-09 01:14:48] start final_train mbert__biaffine_fix__multilingual
+[2026-10-09 06:16:17] done final_train mbert__biaffine_fix__multilingual
 ```
