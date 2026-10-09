@@ -1,13 +1,11 @@
 # Progresso — `maquina_bert`
 
-Atualizado em **09/10/2026 00:29** (atualização a cada hora e ao fim de cada etapa).
+Atualizado em **09/10/2026 01:14** (atualização a cada hora e ao fim de cada etapa).
 
 ## Agora
 
-- **Job:** `mbert__biaffine_fix__multilingual` — busca (validação cruzada)
-- **Configuração / fold:** config 9, fold 4
-- **Fold atual:** 29% (21362/74480 passos), ~41:31 restantes, 21.32 it/s
-- **GPU:** NVIDIA GeForce RTX 4090, 93 %, 5422 MiB, 24564 MiB
+- Nenhum job rodando.
+- **GPU:** NVIDIA GeForce RTX 4090, 0 %, 52 MiB, 24564 MiB
 
 ## Jobs
 
@@ -20,7 +18,7 @@ Atualizado em **09/10/2026 00:29** (atualização a cada hora e ao fim de cada e
 | maquina_bert | `bert__biaffine_fix__en` | final pronto |  | en: LAS 92.34 (gulosa) |
 | maquina_bert | `bert__biaffine__en` | final pronto |  | en: LAS 80.23 (gulosa) |
 | compartilhado | `mbert__linear__multilingual` | final pronto | maquina_beto | pt: LAS 93.48 en: LAS 86.98 es: LAS 88.57 (gulosa) |
-| compartilhado | `mbert__biaffine_fix__multilingual` | busca 49/50 folds | maquina_bert | 58 min/fold, ~1 h restantes na busca; melhor LAS médio de validação 92.23 |
+| compartilhado | `mbert__biaffine_fix__multilingual` | busca pronta | maquina_bert | 58 min/fold, ~0 h restantes na busca; melhor LAS médio de validação 92.23 |
 | compartilhado | `mbert__biaffine__multilingual` | busca pronta | maquina_beto | 38 min/fold, ~0 h restantes na busca; melhor LAS médio de validação 88.48 |
 | compartilhado | `bertimbau-base__biaffine_fix__pt` | pendente | livre |  |
 | compartilhado | `mbert__biaffine_fix__pt` | pendente | livre |  |
@@ -43,7 +41,6 @@ Atualizado em **09/10/2026 00:29** (atualização a cada hora e ao fim de cada e
 ## Eventos recentes
 
 ```
-[2026-10-05 16:11:52] done final_train bert__biaffine_fix__en
 [2026-10-05 16:11:53] start search bert__biaffine__en
 [2026-10-06 08:54:00] start search bert__biaffine__en
 [2026-10-06 16:14:28] done search bert__biaffine__en
@@ -53,4 +50,5 @@ Atualizado em **09/10/2026 00:29** (atualização a cada hora e ao fim de cada e
 [2026-10-06 18:03:38] start search mbert__biaffine_fix__multilingual
 [2026-10-08 03:12:06] start search mbert__biaffine_fix__multilingual
 [2026-10-08 13:28:41] start search mbert__biaffine_fix__multilingual
+[2026-10-09 01:14:46] done search mbert__biaffine_fix__multilingual
 ```
