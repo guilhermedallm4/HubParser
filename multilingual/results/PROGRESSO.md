@@ -1,6 +1,6 @@
 # Progresso dos experimentos multilíngues
 
-Atualizado em **21/10/2026 03:53** (horário de Brasília) pela máquina BERT, de hora em hora.
+Atualizado em **21/10/2026 04:54** (horário de Brasília) pela máquina BERT, de hora em hora.
 Os dados da máquina BETO chegam pelos envios dela (a cada 6 h e no fim de cada etapa); último envio da máquina BETO: **09/10 03:38**.
 
 ## Fila
