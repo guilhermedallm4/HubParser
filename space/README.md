@@ -36,6 +36,8 @@ O texto não sai do computador de quem usa. Na primeira análise, o navegador ba
 - Árvore de dependências, tabela com lema e traços, e exportação em CoNLL-U e SVG.
 - Decodificação Eisner (projetiva), MST/Chu-Liu-Edmonds ou gulosa.
 
+Código-fonte: <https://github.com/guilhermedallm4/HubParser>.
+
 Os modelos ficam em [guilhermedallm4/HubParser-Base-B](https://huggingface.co/guilhermedallm4/HubParser-Base-B) e
 nos repositórios irmãos (pasta `onnx/`). No teste completo do Porttinari, esta versão no navegador reproduz
 o modelo em PyTorch com diferença de no máximo 0,009 ponto percentual.
