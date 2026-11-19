@@ -1,0 +1,9 @@
+{
+  "name": "hubparser-validacao-js",
+  "private": true,
+  "type": "module",
+  "description": "Confere o motor JavaScript do navegador contra o Python (ONNX Runtime Web em WebAssembly, no Node).",
+  "dependencies": {
+    "onnxruntime-web": "1.31.1"
+  }
+}
