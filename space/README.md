@@ -1,5 +1,5 @@
 ---
-title: Análise Sintática de Dependências para o português
+title: Análise de Dependência Sintática para o português
 colorFrom: purple
 colorTo: indigo
 sdk: static
