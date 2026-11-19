@@ -1,6 +1,6 @@
 # HubParser
 
-Análise sintática de dependências para o português, **direto no navegador**.
+Análise de dependência sintática para o português, **direto no navegador**.
 
 O HubParser recebe um texto livre e devolve, para cada palavra, a classe gramatical (UPOS), o lema, os traços
 morfológicos (FEATS) e a relação de dependência (HEAD e DEPREL), no padrão

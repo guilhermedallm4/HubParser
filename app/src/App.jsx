@@ -107,21 +107,21 @@ export default function App() {
           </a>
           <div className="topo-titulo">
             <h1>HubParser</h1>
-            <p>Análise sintática de dependências para o português</p>
+            <p>Análise de Dependência Sintática para o português</p>
           </div>
         </div>
       </header>
 
       <main id="conteudo" className="conteudo">
         <section className="intro">
-          <h2>Da frase à árvore sintática</h2>
+          <h2>Árvore Sintática</h2>
           <p>
             Digite um texto em português. O HubParser identifica, para cada palavra, a <strong>classe gramatical</strong>,
             o <strong>lema</strong>, os <strong>traços morfológicos</strong> e a <strong>relação sintática</strong> com a
             palavra de que depende, no padrão <a href="https://universaldependencies.org/" target="_blank" rel="noreferrer">Universal Dependencies</a>.
           </p>
           <p className="privacidade">
-            <span aria-hidden="true">🔒</span> A análise roda <strong>no seu navegador</strong>, na placa de vídeo (WebGPU) ou no
+            A análise roda <strong>no seu navegador</strong>, na placa de vídeo (WebGPU) ou no
             processador. O texto não é enviado a nenhum servidor; só o modelo é baixado na primeira vez e fica guardado.
           </p>
         </section>

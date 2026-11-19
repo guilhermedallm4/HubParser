@@ -7,7 +7,7 @@ app_file: index.html
 pinned: false
 license: mit
 thumbnail: https://huggingface.co/spaces/H2IA/HubParser/resolve/main/thumbnail.png
-short_description: Análise sintática UD do português, direto no navegador
+short_description: Análise de dependência sintática do português no navegador
 models:
 - H2IA/HubParser-Base-B
 - H2IA/HubParser-Large-B
