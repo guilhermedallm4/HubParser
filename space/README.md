@@ -1,5 +1,5 @@
 ---
-title: HubParser
+title: Análise Sintática de Dependências para o português
 colorFrom: purple
 colorTo: indigo
 sdk: static
