@@ -5,7 +5,7 @@ from pathlib import Path
 
 from huggingface_hub import snapshot_download
 
-DONO = "guilhermedallm4"
+DONO = "H2IA"
 MODELOS = ["HubParser-Base-B", "HubParser-Base-L", "HubParser-Large-B", "HubParser-Large-L"]
 # onde ficam os ONNX gerados: <SAIDA>/<modelo>/onnx/model*.onnx
 SAIDA = Path(os.environ.get("HUBPARSER_ONNX", Path(__file__).resolve().parent / "saida"))

@@ -16,7 +16,7 @@ const ONNX = process.env.HUBPARSER_ONNX || path.join(AQUI, "..", "saida");
 async function lerJson(arquivo) {
   const local = process.env.HUBPARSER_MODELOS && path.join(process.env.HUBPARSER_MODELOS, nome, arquivo);
   if (local && fs.existsSync(local)) return JSON.parse(fs.readFileSync(local));
-  const r = await fetch(`https://huggingface.co/guilhermedallm4/${nome}/resolve/main/${arquivo}`);
+  const r = await fetch(`https://huggingface.co/H2IA/${nome}/resolve/main/${arquivo}`);
   return r.json();
 }
 const cfg = await lerJson("config.json");

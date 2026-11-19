@@ -204,7 +204,7 @@ export default function App() {
             <br />Universidade Federal de Pelotas
           </div>
           <div className="rodape-links">
-            <a href="https://huggingface.co/guilhermedallm4" target="_blank" rel="noreferrer">Modelos no Hugging Face</a>
+            <a href="https://huggingface.co/H2IA" target="_blank" rel="noreferrer">Modelos no Hugging Face</a>
             <a href="https://github.com/guilhermedallm4/HubParser" target="_blank" rel="noreferrer">Código no GitHub</a>
             <a href="https://ia.ufpel.edu.br/pt" target="_blank" rel="noreferrer">ia.ufpel.edu.br</a>
             <a href="mailto:h2ia@inf.ufpel.edu.br">h2ia@inf.ufpel.edu.br</a>

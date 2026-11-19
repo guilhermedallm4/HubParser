@@ -1,7 +1,7 @@
 // Modelos, decodificações e limites.
 
 // Pasta de cada modelo: no Hub por padrão; ?modelos=/caminho/ ou VITE_MODELOS_URL trocam a origem (testes locais).
-const PADRAO = "https://huggingface.co/guilhermedallm4/{modelo}/resolve/main/";
+const PADRAO = "https://huggingface.co/H2IA/{modelo}/resolve/main/";
 function origem() {
   try {
     const q = new URLSearchParams(globalThis.location?.search ?? "").get("modelos");

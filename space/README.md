@@ -6,13 +6,13 @@ sdk: static
 app_file: index.html
 pinned: false
 license: mit
-thumbnail: https://huggingface.co/spaces/guilhermedallm4/HubParser/resolve/main/thumbnail.png
+thumbnail: https://huggingface.co/spaces/H2IA/HubParser/resolve/main/thumbnail.png
 short_description: Análise sintática UD do português, direto no navegador
 models:
-- guilhermedallm4/HubParser-Base-B
-- guilhermedallm4/HubParser-Large-B
-- guilhermedallm4/HubParser-Base-L
-- guilhermedallm4/HubParser-Large-L
+- H2IA/HubParser-Base-B
+- H2IA/HubParser-Large-B
+- H2IA/HubParser-Base-L
+- H2IA/HubParser-Large-L
 tags:
 - dependency-parsing
 - universal-dependencies
@@ -38,6 +38,6 @@ O texto não sai do computador de quem usa. Na primeira análise, o navegador ba
 
 Código-fonte: <https://github.com/guilhermedallm4/HubParser>.
 
-Os modelos ficam em [guilhermedallm4/HubParser-Base-B](https://huggingface.co/guilhermedallm4/HubParser-Base-B) e
+Os modelos ficam em [H2IA/HubParser-Base-B](https://huggingface.co/H2IA/HubParser-Base-B) e
 nos repositórios irmãos (pasta `onnx/`). No teste completo do Porttinari, esta versão no navegador reproduz
 o modelo em PyTorch com diferença de no máximo 0,009 ponto percentual.

@@ -8,7 +8,7 @@ morfológicos (FEATS) e a relação de dependência (HEAD e DEPREL), no padrão
 É um projeto do Hub de Inovação em Inteligência Artificial ([H2IA](https://ia.ufpel.edu.br/pt)) da
 Universidade Federal de Pelotas.
 
-**Experimente:** <https://huggingface.co/spaces/guilhermedallm4/HubParser>
+**Experimente:** <https://huggingface.co/spaces/H2IA/HubParser>
 
 A análise roda no computador de quem usa, com o [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/):
 na placa de vídeo (WebGPU) quando ela suporta meia precisão, ou no processador (WebAssembly) nos demais casos.
@@ -19,10 +19,10 @@ para as próximas visitas.
 
 | Modelo | Encoder | Cabeçote | LAS | UAS | Download (fp16) | Palavras por frase |
 |---|---|---|---|---|---|---|
-| [HubParser-Base-B](https://huggingface.co/guilhermedallm4/HubParser-Base-B) | BERTimbau Base | Biaffine | 95,94 | 96,96 | 212 MB | até 510 |
-| [HubParser-Large-B](https://huggingface.co/guilhermedallm4/HubParser-Large-B) | BERTimbau Large | Biaffine | 96,16 | 97,20 | 643 MB | até 510 |
-| [HubParser-Base-L](https://huggingface.co/guilhermedallm4/HubParser-Base-L) | BERTimbau Base | Linear | 92,77 | 94,18 | 209 MB | até 199 |
-| [HubParser-Large-L](https://huggingface.co/guilhermedallm4/HubParser-Large-L) | BERTimbau Large | Linear | 93,79 | 95,15 | 639 MB | até 199 |
+| [HubParser-Base-B](https://huggingface.co/H2IA/HubParser-Base-B) | BERTimbau Base | Biaffine | 95,94 | 96,96 | 212 MB | até 510 |
+| [HubParser-Large-B](https://huggingface.co/H2IA/HubParser-Large-B) | BERTimbau Large | Biaffine | 96,16 | 97,20 | 643 MB | até 510 |
+| [HubParser-Base-L](https://huggingface.co/H2IA/HubParser-Base-L) | BERTimbau Base | Linear | 92,77 | 94,18 | 209 MB | até 199 |
+| [HubParser-Large-L](https://huggingface.co/H2IA/HubParser-Large-L) | BERTimbau Large | Linear | 93,79 | 95,15 | 639 MB | até 199 |
 
 LAS e UAS no teste do Porttinari (1.683 frases, 33.580 palavras), com decodificação Eisner. Cada repositório de
 modelo traz os pesos em PyTorch (com `model.parse(...)` em Python) e, na pasta `onnx/`, a versão fp16 usada aqui.
