@@ -27,6 +27,7 @@ export const DEPREL = {
   "nsubj:outer": "sujeito externo (construção copulativa)",
   csubj: "sujeito oracional",
   "csubj:pass": "sujeito oracional da passiva",
+  "csubj:outer": "sujeito oracional externo (construção copulativa)",
   obj: "objeto direto",
   iobj: "objeto indireto",
   obl: "oblíquo (adjunto ou complemento com preposição)",
@@ -68,7 +69,38 @@ export const DEPREL = {
   orphan: "órfão (elipse)",
   list: "lista",
   dep: "dependência não especificada",
+  reparandum: "trecho corrigido (disfluência)",
   punct: "pontuação",
+};
+
+// Grupos da legenda, só com as 44 relações que o modelo prediz (inventário do Porttinari).
+export const GRUPOS_DEPREL = [
+  ["Núcleo da frase", ["root"]],
+  ["Sujeitos e complementos", ["nsubj", "nsubj:pass", "nsubj:outer", "csubj", "csubj:pass", "csubj:outer", "obj", "iobj",
+    "ccomp", "ccomp:speech", "xcomp", "obl:agent", "expl", "expl:impers"]],
+  ["Modificadores e adjuntos", ["obl", "advmod", "advcl", "amod", "nmod", "nummod", "appos", "acl", "acl:relcl"]],
+  ["Palavras funcionais", ["det", "case", "mark", "cc", "cop", "aux", "aux:pass"]],
+  ["Coordenação e expressões de várias palavras", ["conj", "flat", "flat:name", "flat:foreign", "fixed"]],
+  ["Outras relações", ["parataxis", "discourse", "vocative", "dislocated", "orphan", "list", "reparandum", "punct"]],
+];
+
+// Traços morfológicos (FEATS) que aparecem no Porttinari.
+export const FEATS = {
+  Gender: ["Gênero", { Masc: "masculino", Fem: "feminino" }],
+  Number: ["Número", { Sing: "singular", Plur: "plural" }],
+  Person: ["Pessoa", { 1: "1ª", 2: "2ª", 3: "3ª" }],
+  Tense: ["Tempo", { Pres: "presente", Past: "pretérito perfeito", Imp: "pretérito imperfeito", Pqp: "mais-que-perfeito", Fut: "futuro" }],
+  Mood: ["Modo", { Ind: "indicativo", Sub: "subjuntivo", Imp: "imperativo", Cnd: "condicional (futuro do pretérito)" }],
+  VerbForm: ["Forma verbal", { Fin: "finita (conjugada)", Inf: "infinitivo", Ger: "gerúndio", Part: "particípio" }],
+  Voice: ["Voz", { Pass: "passiva" }],
+  Definite: ["Definitude", { Def: "definido", Ind: "indefinido" }],
+  PronType: ["Tipo de pronome", { Art: "artigo", Prs: "pessoal", Dem: "demonstrativo", Ind: "indefinido", Int: "interrogativo", Rel: "relativo" }],
+  Case: ["Caso (pronomes)", { Nom: "reto", Acc: "oblíquo átono (acusativo)", Dat: "oblíquo átono (dativo)" }],
+  NumType: ["Tipo de numeral", { Card: "cardinal", Ord: "ordinal", Frac: "fracionário" }],
+  Poss: ["Possessivo", { Yes: "sim" }],
+  Abbr: ["Abreviatura", { Yes: "sim" }],
+  Foreign: ["Estrangeirismo", { Yes: "sim" }],
+  ExtPos: ["Classe da locução", { ADP: "preposição", ADV: "advérbio", CCONJ: "conjunção coordenativa", SCONJ: "conjunção subordinativa", PRON: "pronome" }],
 };
 
 export const descreverUpos = (u) => UPOS[u]?.nome ?? u;

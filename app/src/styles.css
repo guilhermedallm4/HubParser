@@ -220,3 +220,87 @@ textarea:focus { outline: none; border-color: var(--roxo-500); background: #fff;
 .progresso-barra.indeterminada span { position: absolute; width: 35%; animation: vai-e-volta 1.2s ease-in-out infinite; }
 @keyframes vai-e-volta { 0% { left: -35%; } 100% { left: 100%; } }
 @media (prefers-reduced-motion: reduce) { .progresso-barra.indeterminada span { animation: none; left: 0; width: 100%; opacity: 0.5; } }
+
+/* ── modo simples / avançado ─────────────────────── */
+.modo { margin-left: auto; display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25); }
+.modo-botao { font: inherit; font-size: 0.86rem; font-weight: 600; color: rgba(255, 255, 255, 0.85); background: transparent;
+  border: 0; border-radius: 999px; padding: 6px 14px; cursor: pointer; transition: background 0.15s, color 0.15s; }
+.modo-botao:hover { color: #fff; }
+.modo-botao.ativo { background: #fff; color: var(--roxo-700); box-shadow: 0 1px 4px rgba(18, 10, 36, 0.25); }
+.link { font: inherit; color: var(--roxo-700); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.link:hover { color: var(--roxo-900); }
+
+.entrada-simples { grid-template-columns: 1fr; gap: 16px; }
+.entrada-acao { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.entrada-acao .botao-principal { min-width: 260px; }
+.entrada-acao .ajuda.centro { margin-top: 0; }
+.entrada-acao .progresso { width: 100%; max-width: 520px; }
+
+/* ── apresentação e desempenho ───────────────────── */
+.intro p { max-width: 920px; }
+.intro p strong { color: var(--texto); }
+.desempenho { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; max-width: 920px; margin: 0 0 8px; }
+.desempenho div { background: var(--cartao); border: 1px solid var(--borda); border-radius: 12px; padding: 10px 12px; box-shadow: var(--sombra); }
+.desempenho strong { display: block; font-size: 1.35rem; color: var(--roxo-700); line-height: 1.2; font-variant-numeric: tabular-nums; }
+.desempenho span { font-size: 0.8rem; color: var(--texto-suave); }
+@media (max-width: 760px) { .desempenho { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.intro p.desempenho-nota { font-size: 0.85rem; margin-bottom: 16px; }
+
+/* ── guia de leitura ─────────────────────────────── */
+.legenda summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
+.legenda-titulo { font-size: 1.05rem; }
+.legenda-sub { font-weight: 400; font-size: 0.88rem; color: var(--texto-suave); }
+.legenda-como { color: var(--texto-suave); font-size: 0.92rem; margin: 12px 0 14px; max-width: 920px; }
+.legenda-abas { width: fit-content; max-width: 100%; flex-wrap: wrap; margin-bottom: 14px; }
+.sigla { font-family: var(--mono); font-size: 0.72rem; opacity: 0.7; margin-left: 2px; }
+.legenda .legenda-upos { margin: 0 0 6px; }
+.legenda-grupos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px 24px; }
+.legenda-grupos h4 { margin: 0 0 6px; color: var(--roxo-500); font-size: 0.92rem; }
+.legenda-grupos dl, .legenda-feats { margin: 0; }
+.legenda-grupos dl > div { display: grid; grid-template-columns: 112px 1fr; gap: 8px; padding: 3px 0; border-bottom: 1px solid #f0ebf7; font-size: 0.88rem; }
+.legenda-grupos dt code, .legenda-feats code { font-family: var(--mono); color: var(--roxo-700); font-size: 0.82rem; }
+.legenda-grupos dd, .legenda-feats dd { margin: 0; color: var(--texto); }
+.legenda-feats { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px 24px; margin-top: 10px; }
+.legenda-feats dt { font-weight: 600; font-size: 0.9rem; color: var(--roxo-900); margin-bottom: 3px; }
+.legenda-feats .traco code { color: var(--roxo-700); }
+
+/* ── como citar ──────────────────────────────────── */
+.citacao { padding: 20px 22px; }
+.citacao h2 { margin: 0 0 6px; color: var(--roxo-500); font-size: 1.3rem; }
+.citacao > p { margin: 0 0 12px; color: var(--texto-suave); }
+.referencia { margin: 0 0 14px; padding: 12px 16px; border-left: 4px solid var(--roxo-300); background: var(--roxo-50); border-radius: 0 10px 10px 0; }
+.bibtex { border-radius: 12px; overflow: hidden; background: var(--roxo-950); }
+.bibtex-topo { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px 8px 18px; color: #c9bdf0; font-size: 0.82rem; font-weight: 600; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.bibtex pre { margin: 0; padding: 14px 18px; font-family: var(--mono); font-size: 0.82rem; color: #e9e2ff; overflow-x: auto; }
+.botao-claro { background: transparent; color: #fff; border-color: rgba(255, 255, 255, 0.35); padding: 4px 12px; }
+.botao-claro:hover { background: rgba(255, 255, 255, 0.1); }
+.citacao .ajuda { margin-top: 12px; }
+
+/* ── rodapé institucional ────────────────────────── */
+.rodape { padding: 0; background: linear-gradient(160deg, var(--roxo-950), var(--roxo-800) 55%, var(--roxo-700)); }
+.rodape-conteudo { display: block; }
+.instituicoes { display: flex; flex-wrap: wrap; gap: 28px 56px; padding: 32px 0 26px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+.instituicoes-grupo { display: flex; flex-direction: column; gap: 14px; }
+.instituicoes-rotulo { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255, 255, 255, 0.6); font-weight: 600; }
+.instituicoes-logos { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 34px; }
+.rodape a.marca { display: flex; align-items: center; gap: 10px; opacity: 0.92; text-decoration: none; color: #fff; transition: opacity 0.15s, transform 0.15s; }
+.rodape a.marca:hover { opacity: 1; transform: translateY(-1px); }
+.marca-h2ia { height: 38px; width: auto; display: block; }
+.marca-ufpel { height: 48px; width: auto; display: block; filter: brightness(0) invert(1); }
+.rodape-base { display: flex; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; align-items: center; padding: 16px 0 20px; font-size: 0.86rem; opacity: 0.92; }
+
+@media (max-width: 600px) {
+  .modo { margin-left: 0; }
+  .entrada-acao .botao-principal { width: 100%; min-width: 0; }
+  .instituicoes-logos { gap: 16px 24px; }
+}
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+#root > main { flex: 1 0 auto; width: 100%; }
+.marca-h2ia { height: 44px; }
+.marca-ufpel { height: 58px; }
+/* logos recortados (PNG transparente, brancos) */
+.marca-placa { display: block; width: auto; }
+.marca-ppgc { height: 58px; }
+.marca-poetisa { height: 54px; }
+@media (max-width: 600px) { .marca-poetisa { height: auto; width: 100%; max-width: 300px; } }

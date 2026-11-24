@@ -9,8 +9,9 @@ const ABAS = [
   ["conllu", "CoNLL-U"],
 ];
 
-export default function Resultado({ frase, indice, conllu }) {
-  const [aba, setAba] = useState("arvore");
+export default function Resultado({ frase, indice, conllu, simples = false }) {
+  const [abaEscolhida, setAba] = useState("arvore");
+  const aba = simples && abaEscolhida === "conllu" ? "arvore" : abaEscolhida;
   const [destaque, setDestaque] = useState(null);
   const svgRef = useRef(null);
   const id = `frase-${indice}`;
@@ -28,7 +29,7 @@ export default function Resultado({ frase, indice, conllu }) {
           <p className="frase-texto">“{frase.texto}”</p>
         </div>
         <div className="abas" role="tablist" aria-label={`Visualizações da frase ${indice}`}>
-          {ABAS.map(([k, rotulo]) => (
+          {ABAS.filter(([k]) => !simples || k !== "conllu").map(([k, rotulo]) => (
             <button key={k} role="tab" id={`${id}-aba-${k}`} aria-selected={aba === k} aria-controls={`${id}-painel`}
               className={aba === k ? "aba ativa" : "aba"} onClick={() => setAba(k)}>{rotulo}</button>
           ))}

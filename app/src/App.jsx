@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import Citacao from "./components/Citacao.jsx";
 import Contador from "./components/Contador.jsx";
+import Instituicoes from "./components/Instituicoes.jsx";
 import Legenda from "./components/Legenda.jsx";
 import Resultado from "./components/Resultado.jsx";
 import Progresso from "./components/Progresso.jsx";
@@ -11,7 +13,20 @@ import { DECODIFICACOES, LIMITES, MODELOS } from "./modelos.js";
 import { EXEMPLOS } from "./rotulos.js";
 import { baixar, blocosConllu } from "./util.js";
 
+// Interface simples (padrão, para quem não é da área) ou completa (escolha de modelo, decodificação e processador).
+const RECOMENDADO = { modelo: "HubParser-Base-B", decod: "eisner" };
+function modoInicial() {
+  try {
+    const q = new URLSearchParams(location.search).get("modo");
+    if (q === "simples" || q === "completo") return q;
+    return localStorage.getItem("hubparser-modo") === "completo" ? "completo" : "simples";
+  } catch {
+    return "simples";
+  }
+}
+
 export default function App() {
+  const [modo, setModo] = useState(modoInicial);
   const [ambiente, setAmbiente] = useState(null); // { gpu, baixados }
   const [erroConfig, setErroConfig] = useState(null);
   const [dispositivo, setDispositivo] = useState("webgpu");
@@ -26,6 +41,21 @@ export default function App() {
   const [erro, setErro] = useState(null);
   const [copiado, setCopiado] = useState(false);
   const resultadosRef = useRef(null);
+
+  function trocarModo(novo) {
+    setModo(novo);
+    try {
+      localStorage.setItem("hubparser-modo", novo);
+      const url = new URL(location.href);
+      url.searchParams.set("modo", novo);
+      history.replaceState(null, "", url);
+    } catch { /* sem armazenamento: vale só nesta visita */ }
+  }
+  const simples = modo === "simples";
+  // no modo simples valem sempre as opções recomendadas
+  const modeloUsado = simples ? RECOMENDADO.modelo : modelo;
+  const decodUsada = simples ? RECOMENDADO.decod : decod;
+  const dispositivoUsado = simples ? (ambiente?.gpu?.disponivel === false ? "wasm" : dispositivo) : dispositivo;
 
   useEffect(() => {
     motor.iniciar()
@@ -45,7 +75,7 @@ export default function App() {
     let valido = true;
     setContando(true);
     const t = setTimeout(() => {
-      motor.preprocessar(texto, modelo)
+      motor.preprocessar(texto, modeloUsado)
         .then((r) => valido && setPrevia(r))
         .catch(() => {})
         .finally(() => valido && setContando(false));
@@ -54,9 +84,9 @@ export default function App() {
       valido = false;
       clearTimeout(t);
     };
-  }, [texto, modelo]);
+  }, [texto, modeloUsado]);
 
-  const infoModelo = useMemo(() => MODELOS.find((m) => m.id === modelo), [modelo]);
+  const infoModelo = useMemo(() => MODELOS.find((m) => m.id === modeloUsado), [modeloUsado]);
   const podeAnalisar = !!texto.trim() && !analisando && (previa ? previa.ok : true);
 
   async function analisar() {
@@ -65,9 +95,9 @@ export default function App() {
     setErro(null);
     setProgresso(null);
     try {
-      const r = await motor.analisar(texto, modelo, decod, dispositivo, setProgresso);
+      const r = await motor.analisar(texto, modeloUsado, decodUsada, dispositivoUsado, setProgresso);
       setResultado(r);
-      setAmbiente((a) => a && { gpu: r.gpu, baixados: a.baixados.includes(modelo) ? a.baixados : [...a.baixados, modelo] });
+      setAmbiente((a) => a && { gpu: r.gpu, baixados: a.baixados.includes(modeloUsado) ? a.baixados : [...a.baixados, modeloUsado] });
       if (!r.gpu.disponivel) setDispositivo("wasm");
       requestAnimationFrame(() => resultadosRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
     } catch (e) {
@@ -97,6 +127,15 @@ export default function App() {
 
   const blocos = resultado ? blocosConllu(resultado.conllu) : [];
 
+  const botaoAnalisar = (
+    <button className="botao-principal" onClick={analisar} disabled={!podeAnalisar} aria-busy={analisando}>
+      {analisando ? <><span className="spinner" aria-hidden="true" /> {progresso?.etapa === "baixando" ? "Baixando o modelo…" : progresso?.etapa === "preparando" ? "Preparando o modelo…" : "Analisando…"}</> : "Analisar"}
+    </button>
+  );
+  const avisoDownload = !analisando && infoModelo && !ambiente?.baixados.includes(modeloUsado) && (
+    <p className="ajuda centro">Na primeira análise, o navegador baixa o modelo ({infoModelo.mb} MB). Nas próximas, ele já estará guardado.</p>
+  );
+
   return (
     <>
       <a className="pular" href="#conteudo">Pular para o conteúdo</a>
@@ -109,16 +148,38 @@ export default function App() {
             <h1>HubParser</h1>
             <p>Análise de Dependência Sintática para o português</p>
           </div>
+          <div className="modo" role="group" aria-label="Tipo de interface">
+            <button className={simples ? "modo-botao ativo" : "modo-botao"} aria-pressed={simples} onClick={() => trocarModo("simples")}
+              title="Interface simples, já configurada com as opções recomendadas">Simples</button>
+            <button className={!simples ? "modo-botao ativo" : "modo-botao"} aria-pressed={!simples} onClick={() => trocarModo("completo")}
+              title="Escolha do modelo, da decodificação e do processamento">Avançado</button>
+          </div>
         </div>
       </header>
 
       <main id="conteudo" className="conteudo">
-        <section className="intro">
-          <h2>Árvore Sintática</h2>
+        <section className="intro" aria-labelledby="titulo-intro">
+          <h2 id="titulo-intro">O que é o HubParser?</h2>
           <p>
-            Digite um texto em português. O HubParser identifica, para cada palavra, a <strong>classe gramatical</strong>,
-            o <strong>lema</strong>, os <strong>traços morfológicos</strong> e a <strong>relação sintática</strong> com a
-            palavra de que depende, no padrão <a href="https://universaldependencies.org/" target="_blank" rel="noreferrer">Universal Dependencies</a>.
+            O HubParser é um <strong>analisador sintático automático</strong> (<em>parser</em>) do português brasileiro. Para
+            cada sentença de entrada, ele produz a sua <strong>árvore sintática de dependências</strong>: indica de qual palavra
+            cada palavra depende e qual função ela cumpre na frase (sujeito, objeto, adjunto…). Também identifica a{" "}
+            <strong>classe gramatical</strong>, o <strong>lema</strong> e os <strong>traços morfológicos</strong> (gênero,
+            número, tempo, modo…) de cada palavra, no padrão{" "}
+            <a href="https://universaldependencies.org/" target="_blank" rel="noreferrer">Universal Dependencies</a>. Foi
+            desenvolvido no PPGC e no H2IA da UFPel e treinado no Porttinari, corpus anotado do projeto{" "}
+            <a href="https://sites.google.com/icmc.usp.br/poetisa" target="_blank" rel="noreferrer">POeTiSA</a>.
+          </p>
+          <div className="desempenho" aria-label="Desempenho do modelo recomendado no teste do Porttinari">
+            <div><strong>99,3%</strong><span>classe gramatical</span></div>
+            <div><strong>99,1%</strong><span>lema</span></div>
+            <div><strong>99,1%</strong><span>traços morfológicos</span></div>
+            <div><strong>97,0%</strong><span>palavra-núcleo (UAS)</span></div>
+            <div><strong>95,9%</strong><span>núcleo e relação (LAS)</span></div>
+          </div>
+          <p className="desempenho-nota">
+            Acertos do modelo recomendado nas 1.683 frases de teste do Porttinari (33.580 palavras), que não foram usadas no
+            treino (<a href="#como-citar">Lima, 2026</a>).
           </p>
           <p className="privacidade">
             A análise roda <strong>no seu navegador</strong>, na placa de vídeo (WebGPU) ou no
@@ -128,15 +189,15 @@ export default function App() {
 
         {erroConfig && <div className="aviso erro" role="alert">{erroConfig}</div>}
 
-        <section className="cartao entrada" aria-labelledby="titulo-entrada">
+        <section className={simples ? "cartao entrada entrada-simples" : "cartao entrada"} aria-labelledby="titulo-entrada">
           <div className="entrada-texto">
-            <label id="titulo-entrada" htmlFor="texto" className="rotulo">Texto</label>
+            <label id="titulo-entrada" htmlFor="texto" className="rotulo">{simples ? "Digite ou cole um texto em português" : "Texto"}</label>
             <textarea
               id="texto"
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               onKeyDown={aoTeclar}
-              rows={6}
+              rows={simples ? 4 : 6}
               maxLength={LIMITES.max_caracteres}
               placeholder="Ex.: O restaurante universitário da UFPel serve almoço e jantar."
               aria-describedby="contador ajuda-texto"
@@ -151,23 +212,31 @@ export default function App() {
               ))}
               {texto && <button type="button" className="chip chip-limpar" onClick={() => setTexto("")}>Limpar</button>}
             </div>
-            <div id="contador">{infoModelo && <Contador previa={previa} modelo={infoModelo} carregando={contando} />}</div>
+            <div id="contador">{infoModelo && <Contador previa={previa} modelo={infoModelo} carregando={contando} compacto={simples} />}</div>
           </div>
 
-          <div className="entrada-opcoes">
-            <SeletorModelo modelos={MODELOS} valor={modelo} onChange={setModelo} desabilitado={analisando}
-              baixados={ambiente?.baixados ?? []} />
-            <SeletorDecodificacao opcoes={DECODIFICACOES} valor={decod} onChange={setDecod} desabilitado={analisando} />
-            <SeletorDispositivo gpu={ambiente?.gpu} valor={dispositivo} onChange={setDispositivo} desabilitado={analisando || !ambiente} />
-            <button className="botao-principal" onClick={analisar} disabled={!podeAnalisar} aria-busy={analisando}>
-              {analisando ? <><span className="spinner" aria-hidden="true" /> {progresso?.etapa === "baixando" ? "Baixando o modelo…" : progresso?.etapa === "preparando" ? "Preparando o modelo…" : "Analisando…"}</> : "Analisar"}
-            </button>
-            {analisando && <Progresso progresso={progresso} modelo={infoModelo} />}
-            {!analisando && infoModelo && !ambiente?.baixados.includes(modelo) && (
-              <p className="ajuda centro">Na primeira análise, o {modelo.replace("HubParser-", "")} baixa cerca de {infoModelo.mb} MB.</p>
-            )}
-            <p id="ajuda-texto" className="ajuda centro">Atalho: <kbd>Ctrl</kbd> + <kbd>Enter</kbd></p>
-          </div>
+          {simples ? (
+            <div className="entrada-acao">
+              {botaoAnalisar}
+              {analisando && <Progresso progresso={progresso} modelo={infoModelo} />}
+              {avisoDownload}
+              <p id="ajuda-texto" className="ajuda centro">
+                Já configurado com as opções recomendadas.{" "}
+                <button type="button" className="link" onClick={() => trocarModo("completo")}>Ver opções avançadas</button>
+              </p>
+            </div>
+          ) : (
+            <div className="entrada-opcoes">
+              <SeletorModelo modelos={MODELOS} valor={modelo} onChange={setModelo} desabilitado={analisando}
+                baixados={ambiente?.baixados ?? []} />
+              <SeletorDecodificacao opcoes={DECODIFICACOES} valor={decod} onChange={setDecod} desabilitado={analisando} />
+              <SeletorDispositivo gpu={ambiente?.gpu} valor={dispositivo} onChange={setDispositivo} desabilitado={analisando || !ambiente} />
+              {botaoAnalisar}
+              {analisando && <Progresso progresso={progresso} modelo={infoModelo} />}
+              {avisoDownload}
+              <p id="ajuda-texto" className="ajuda centro">Atalho: <kbd>Ctrl</kbd> + <kbd>Enter</kbd></p>
+            </div>
+          )}
         </section>
 
         {erro && <div className="aviso erro" role="alert">{erro}</div>}
@@ -177,37 +246,45 @@ export default function App() {
           {resultado && (
             <>
               <div className="barra-resultados">
-                <p>
-                  <strong>{resultado.frases.length}</strong> {resultado.frases.length === 1 ? "frase analisada" : "frases analisadas"} com o{" "}
-                  <strong>{resultado.modelo}</strong> · decodificação {resultado.decodificacao} ·{" "}
-                  {resultado.dispositivo === "webgpu" ? "GPU (WebGPU)" : "CPU (WebAssembly)"} · {resultado.tempo_ms} ms
-                  {resultado.carga_ms > 500 && <> (+ {(resultado.carga_ms / 1000).toFixed(1)} s para carregar o modelo)</>}
-                </p>
+                {simples ? (
+                  <p><strong>{resultado.frases.length}</strong> {resultado.frases.length === 1 ? "frase analisada" : "frases analisadas"} em {(resultado.tempo_ms / 1000).toFixed(1).replace(".", ",")} s</p>
+                ) : (
+                  <p>
+                    <strong>{resultado.frases.length}</strong> {resultado.frases.length === 1 ? "frase analisada" : "frases analisadas"} com o{" "}
+                    <strong>{resultado.modelo}</strong> · decodificação {resultado.decodificacao} ·{" "}
+                    {resultado.dispositivo === "webgpu" ? "GPU (WebGPU)" : "CPU (WebAssembly)"} · {resultado.tempo_ms} ms
+                    {resultado.carga_ms > 500 && <> (+ {(resultado.carga_ms / 1000).toFixed(1)} s para carregar o modelo)</>}
+                  </p>
+                )}
                 <div className="acoes">
-                  <button className="botao-secundario" onClick={copiarConllu}>{copiado ? "Copiado ✓" : "Copiar CoNLL-U"}</button>
+                  {!simples && <button className="botao-secundario" onClick={copiarConllu}>{copiado ? "Copiado ✓" : "Copiar CoNLL-U"}</button>}
                   <button className="botao-secundario" onClick={() => baixar("hubparser.conllu", resultado.conllu)}>Baixar .conllu</button>
                 </div>
               </div>
               {resultado.frases.map((f, i) => (
-                <Resultado key={`${resultado.tempo_ms}-${i}`} frase={f} indice={i + 1} conllu={blocos[i]} />
+                <Resultado key={`${resultado.tempo_ms}-${i}`} frase={f} indice={i + 1} conllu={blocos[i]} simples={simples} />
               ))}
             </>
           )}
           <Legenda />
+          <Citacao />
         </section>
       </main>
 
       <footer className="rodape">
         <div className="rodape-conteudo">
-          <div>
-            <strong>HubParser</strong> · Hub de Inovação em Inteligência Artificial (H2IA)
-            <br />Universidade Federal de Pelotas
-          </div>
-          <div className="rodape-links">
-            <a href="https://huggingface.co/H2IA" target="_blank" rel="noreferrer">Modelos no Hugging Face</a>
-            <a href="https://github.com/guilhermedallm4/HubParser" target="_blank" rel="noreferrer">Código no GitHub</a>
-            <a href="https://ia.ufpel.edu.br/pt" target="_blank" rel="noreferrer">ia.ufpel.edu.br</a>
-            <a href="mailto:h2ia@inf.ufpel.edu.br">h2ia@inf.ufpel.edu.br</a>
+          <Instituicoes />
+          <div className="rodape-base">
+            <div>
+              <strong>HubParser</strong> · Hub de Inovação em Inteligência Artificial (H2IA) · Programa de Pós-Graduação em
+              Computação (PPGC) · Universidade Federal de Pelotas
+            </div>
+            <div className="rodape-links">
+              <a href="https://huggingface.co/H2IA" target="_blank" rel="noreferrer">Modelos no Hugging Face</a>
+              <a href="https://github.com/guilhermedallm4/HubParser" target="_blank" rel="noreferrer">Código no GitHub</a>
+              <a href="https://sites.google.com/icmc.usp.br/poetisa" target="_blank" rel="noreferrer">Projeto POeTiSA</a>
+              <a href="mailto:h2ia@inf.ufpel.edu.br">h2ia@inf.ufpel.edu.br</a>
+            </div>
           </div>
         </div>
       </footer>
