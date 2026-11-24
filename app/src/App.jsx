@@ -166,7 +166,7 @@ export default function App() {
             <strong>classe gramatical</strong>, o <strong>lema</strong> e os <strong>traços morfológicos</strong> (gênero,
             número, tempo, modo…) de cada palavra, no padrão{" "}
             <a href="https://universaldependencies.org/" target="_blank" rel="noreferrer">Universal Dependencies</a>. Foi
-            desenvolvido no PPGC e no H2IA da UFPel e treinado no Porttinari, em parceria com o projeto{" "}
+            desenvolvido no PPGC e no H2IA da UFPel e treinado no Porttinari, em colaboração com o projeto{" "}
             <a href="https://sites.google.com/icmc.usp.br/poetisa" target="_blank" rel="noreferrer">POeTiSA</a>.
           </p>
           <div className="desempenho" aria-label="Desempenho do modelo recomendado no teste do Porttinari">
