@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Citacao from "./components/Citacao.jsx";
 import Contador from "./components/Contador.jsx";
 import Instituicoes from "./components/Instituicoes.jsx";
-import Legenda from "./components/Legenda.jsx";
 import Resultado from "./components/Resultado.jsx";
 import Progresso from "./components/Progresso.jsx";
 import SeletorDecodificacao from "./components/SeletorDecodificacao.jsx";
@@ -167,7 +166,7 @@ export default function App() {
             <strong>classe gramatical</strong>, o <strong>lema</strong> e os <strong>traços morfológicos</strong> (gênero,
             número, tempo, modo…) de cada palavra, no padrão{" "}
             <a href="https://universaldependencies.org/" target="_blank" rel="noreferrer">Universal Dependencies</a>. Foi
-            desenvolvido no PPGC e no H2IA da UFPel e treinado no Porttinari, corpus anotado do projeto{" "}
+            desenvolvido no PPGC e no H2IA da UFPel e treinado no Porttinari, em parceria com o projeto{" "}
             <a href="https://sites.google.com/icmc.usp.br/poetisa" target="_blank" rel="noreferrer">POeTiSA</a>.
           </p>
           <div className="desempenho" aria-label="Desempenho do modelo recomendado no teste do Porttinari">
@@ -257,16 +256,15 @@ export default function App() {
                   </p>
                 )}
                 <div className="acoes">
-                  {!simples && <button className="botao-secundario" onClick={copiarConllu}>{copiado ? "Copiado ✓" : "Copiar CoNLL-U"}</button>}
+                  <button className="botao-secundario" onClick={copiarConllu}>{copiado ? "Copiado ✓" : "Copiar CoNLL-U"}</button>
                   <button className="botao-secundario" onClick={() => baixar("hubparser.conllu", resultado.conllu)}>Baixar .conllu</button>
                 </div>
               </div>
               {resultado.frases.map((f, i) => (
-                <Resultado key={`${resultado.tempo_ms}-${i}`} frase={f} indice={i + 1} conllu={blocos[i]} simples={simples} />
+                <Resultado key={`${resultado.tempo_ms}-${i}`} frase={f} indice={i + 1} conllu={blocos[i]} />
               ))}
             </>
           )}
-          <Legenda />
           <Citacao />
         </section>
       </main>

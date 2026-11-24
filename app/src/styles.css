@@ -193,10 +193,6 @@ textarea:focus { outline: none; border-color: var(--roxo-500); background: #fff;
 
 .conllu { margin: 0; font-family: var(--mono); font-size: 0.82rem; line-height: 1.6; background: var(--roxo-950); color: #e9e2ff; padding: 16px 18px; border-radius: 12px; overflow-x: auto; tab-size: 12; }
 
-.legenda { padding: 14px 20px; }
-.legenda summary { cursor: pointer; font-weight: 700; color: var(--roxo-900); }
-.legenda ul { list-style: none; padding: 0; margin: 14px 0 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 16px; font-size: 0.9rem; }
-.legenda li .pilula-upos { min-width: 58px; text-align: center; margin-right: 6px; }
 
 @media (max-width: 600px) {
   .topo-conteudo { flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -246,24 +242,6 @@ textarea:focus { outline: none; border-color: var(--roxo-500); background: #fff;
 .desempenho span { font-size: 0.8rem; color: var(--texto-suave); }
 @media (max-width: 760px) { .desempenho { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .intro p.desempenho-nota { font-size: 0.85rem; margin-bottom: 16px; }
-
-/* ── guia de leitura ─────────────────────────────── */
-.legenda summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; }
-.legenda-titulo { font-size: 1.05rem; }
-.legenda-sub { font-weight: 400; font-size: 0.88rem; color: var(--texto-suave); }
-.legenda-como { color: var(--texto-suave); font-size: 0.92rem; margin: 12px 0 14px; max-width: 920px; }
-.legenda-abas { width: fit-content; max-width: 100%; flex-wrap: wrap; margin-bottom: 14px; }
-.sigla { font-family: var(--mono); font-size: 0.72rem; opacity: 0.7; margin-left: 2px; }
-.legenda .legenda-upos { margin: 0 0 6px; }
-.legenda-grupos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px 24px; }
-.legenda-grupos h4 { margin: 0 0 6px; color: var(--roxo-500); font-size: 0.92rem; }
-.legenda-grupos dl, .legenda-feats { margin: 0; }
-.legenda-grupos dl > div { display: grid; grid-template-columns: 112px 1fr; gap: 8px; padding: 3px 0; border-bottom: 1px solid #f0ebf7; font-size: 0.88rem; }
-.legenda-grupos dt code, .legenda-feats code { font-family: var(--mono); color: var(--roxo-700); font-size: 0.82rem; }
-.legenda-grupos dd, .legenda-feats dd { margin: 0; color: var(--texto); }
-.legenda-feats { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px 24px; margin-top: 10px; }
-.legenda-feats dt { font-weight: 600; font-size: 0.9rem; color: var(--roxo-900); margin-bottom: 3px; }
-.legenda-feats .traco code { color: var(--roxo-700); }
 
 /* ── como citar ──────────────────────────────────── */
 .citacao { padding: 20px 22px; }
