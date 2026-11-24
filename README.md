@@ -117,7 +117,7 @@ Os modelos em PyTorch são baixados do Hub. Com `HUBPARSER_MODELOS=<pasta>`, usa
 @mastersthesis{lima2026hubparser,
   title  = {HubParser: parsing de dependências multi-tarefa para o português
             brasileiro com encoders BERT},
-  author = {Lima, Guilherme Dallman},
+  author = {Lima, Guilherme Dallmann},
   school = {Universidade Federal de Pelotas},
   year   = {2026}
 }

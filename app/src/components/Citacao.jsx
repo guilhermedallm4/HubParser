@@ -3,7 +3,7 @@ import { useState } from "react";
 const BIBTEX = `@mastersthesis{lima2026hubparser,
   title   = {HubParser: parsing de dependências multi-tarefa para o
              português brasileiro com encoders BERT},
-  author  = {Lima, Guilherme Dallman},
+  author  = {Lima, Guilherme Dallmann},
   school  = {Programa de Pós-Graduação em Computação,
              Universidade Federal de Pelotas},
   address = {Pelotas, RS},
@@ -25,7 +25,7 @@ export default function Citacao() {
       <h2 id="titulo-citacao">Como citar</h2>
       <p>Se o HubParser ajudou no seu trabalho, cite a dissertação em que ele foi desenvolvido:</p>
       <blockquote className="referencia">
-        LIMA, Guilherme Dallman. <strong>HubParser</strong>: parsing de dependências multi-tarefa para o português brasileiro
+        LIMA, Guilherme Dallmann. <strong>HubParser</strong>: parsing de dependências multi-tarefa para o português brasileiro
         com encoders BERT. 2026. Dissertação (Mestrado) – Programa de Pós-Graduação em Computação, Universidade Federal de
         Pelotas, Pelotas, 2026.
       </blockquote>
